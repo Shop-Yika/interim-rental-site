@@ -142,6 +142,24 @@
   .note{font-size:12.5px; color:var(--muted)}
   @media(max-width:700px){ .detail{grid-template-columns:1fr} .row2{grid-template-columns:1fr} }
   .banner{background:var(--sage); color:var(--sage-ink); text-align:center; font-size:13px; padding:8px 16px}
+  /* request calendar */
+  .rqgrid{display:grid; grid-template-columns:1fr 1fr; gap:26px; align-items:start}
+  .rqcal{border:1px solid var(--line); border-radius:12px; overflow:hidden; user-select:none}
+  .rqcal .nav{display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--paper); border-bottom:1px solid var(--line)}
+  .rqcal .nav button{background:#fff; border:1px solid var(--line); border-radius:8px; width:32px; height:32px; cursor:pointer; font-size:16px; line-height:1}
+  .rqcal .grid7{display:grid; grid-template-columns:repeat(7,1fr)}
+  .rqcal .dow{font-size:10px; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); text-align:center; padding:6px 0; border-bottom:1px solid var(--line-soft)}
+  .rqcal .d{min-height:38px; display:flex; align-items:center; justify-content:center; border-right:1px solid var(--line-soft); border-bottom:1px solid var(--line-soft); font-size:12.5px; cursor:pointer}
+  .rqcal .d:nth-child(7n){border-right:0}
+  .rqcal .d.blank{background:var(--line-soft); cursor:default}
+  .rqcal .d.past{color:#ccc; cursor:not-allowed}
+  .rqcal .d.booked{background:var(--danger-bg); color:var(--danger); cursor:not-allowed}
+  .rqcal .d.buffer{background:#efe7d4; color:#9a7d3e; cursor:not-allowed}
+  .rqcal .d.range{background:var(--soft)}
+  .rqcal .d.sel{background:var(--brand); color:#fff}
+  .rqcal-legend{display:flex; gap:14px; font-size:11.5px; color:var(--muted); margin-top:8px; flex-wrap:wrap}
+  .rqcal-legend i{display:inline-block; width:11px; height:11px; border-radius:3px; vertical-align:-1px; margin-right:5px}
+  @media(max-width:700px){ .rqgrid{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
@@ -266,6 +284,9 @@ const fmt = n => 'CAD$ ' + (Number(n)||0).toLocaleString('en-CA',{minimumFractio
 const esc = s => (s==null?'':String(s)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const round2 = n => Math.round((Number(n)||0)*100)/100;
 const todayISO = () => new Date().toISOString().slice(0,10);
+const addDays = (iso,n) => { const d=new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); };
+const daysBetween = (a,b) => Math.round((new Date(b)-new Date(a))/86400000);
+const overlaps = (s1,e1,s2,e2) => s1<=e2 && s2<=e1;
 
 let DATA = null;
 
@@ -308,8 +329,15 @@ function estimate(item, days, method){
 
 /* ---------- load ---------- */
 async function boot(){
-  try{ const r=await fetch(DATA_URL,{cache:'no-store'}); if(!r.ok) throw 0; DATA=await r.json(); if(!DATA.items) throw 0; }
-  catch(e){ DATA=FALLBACK; }
+  DATA=null; let live=false;
+  // 1) live backend (Airtable via serverless) if available
+  try{ const r=await fetch('/api/catalogue',{cache:'no-store'}); if(r.ok){ const d=await r.json(); if(d&&d.items&&d.items.length){ DATA=d; live=true; } } }catch(e){}
+  // 2) static published file
+  if(!DATA){ try{ const r=await fetch(DATA_URL,{cache:'no-store'}); if(r.ok){ const d=await r.json(); if(d&&d.items) DATA=d; } }catch(e){} }
+  // 3) built-in sample
+  if(!DATA||!DATA.items){ DATA=FALLBACK; }
+  if(!DATA.policy) DATA.policy=FALLBACK.policy;
+  window.LIVE_BACKEND = live;
   document.getElementById('yr').textContent=new Date().getFullYear();
   const em=document.getElementById('footEmail'); em.href='mailto:'+REQUEST_EMAIL; em.textContent=REQUEST_EMAIL;
   const nc=document.getElementById('navContact'); if(nc) nc.href='mailto:'+REQUEST_EMAIL;
@@ -366,74 +394,152 @@ function openItem(id){
       </div>
     </div>`);
 }
+/* ---------- request-to-rent with live availability calendar ---------- */
+let rq = { item:null, method:'Standard', start:'', end:'', ranges:[], bufferDays:2, month:null };
 function requestForm(id){
   const it=DATA.items.find(x=>x.id===id)||sel.item;
-  const durs=DATA.pricing.durations||[4];
-  const minStart=todayISO();
+  rq = { item:it, method:'Standard', start:'', end:'', ranges:[], bufferDays:(DATA.pricing&&DATA.pricing.bufferDays)||2, month:new Date() };
+  rq.month.setDate(1);
   openModal(`
     <h2 style="font-size:24px;margin:0 0 4px">Request to rent</h2>
-    <div class="note" style="margin-bottom:16px">${esc(it.brand||'')} — <b>${esc(it.name)}</b></div>
-    <div class="row2">
-      <label class="f"><span class="lbl">Rental period</span>
-        <select id="rq_days" onchange="updEst()">${durs.map(d=>`<option value="${d}">${d} days</option>`).join('')}</select></label>
-      <label class="f"><span class="lbl">Preferred start date</span>
-        <input id="rq_start" type="date" min="${minStart}" onchange="updEst()"></label>
-    </div>
+    <div class="note" style="margin-bottom:18px">${esc(it.brand||'')} — <b>${esc(it.name)}</b></div>
+    <div class="rqgrid">
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--ink-soft);margin-bottom:8px">Choose your dates</div>
+        <div id="rq_cal"><div class="note" style="padding:20px 0">Loading availability…</div></div>
+        <div class="rqcal-legend">
+          <span><i style="background:var(--danger-bg)"></i>Booked</span>
+          <span><i style="background:#efe7d4"></i>Buffer</span>
+          <span><i style="background:var(--brand)"></i>Selected</span>
+        </div>
+      </div>
+      <div id="rq_side"></div>
+    </div>`);
+  renderRqSide();
+  loadAvailability(it.id);
+}
+async function loadAvailability(itemId){
+  try{
+    const r=await fetch('/api/availability?item='+encodeURIComponent(itemId),{cache:'no-store'});
+    if(r.ok){ const d=await r.json(); rq.ranges=d.ranges||[]; rq.bufferDays=d.bufferDays??rq.bufferDays; }
+  }catch(e){ rq.ranges=[]; }
+  renderRqCal();
+}
+function rqDayState(iso){
+  const buf=rq.bufferDays||0;
+  for(const r of rq.ranges){
+    if(iso>=r.start && iso<=r.end) return 'booked';
+    if(iso>=addDays(r.start,-buf) && iso<=addDays(r.end,buf)) return 'buffer';
+  }
+  return 'free';
+}
+function renderRqCal(){
+  const host=document.getElementById('rq_cal'); if(!host) return;
+  const y=rq.month.getFullYear(), m=rq.month.getMonth();
+  const first=new Date(y,m,1), start=first.getDay(), dim=new Date(y,m+1,0).getDate();
+  const label=first.toLocaleString('en-CA',{month:'long',year:'numeric'});
+  let cells='';
+  for(let i=0;i<start;i++) cells+=`<div class="d blank"></div>`;
+  for(let dd=1;dd<=dim;dd++){
+    const iso=`${y}-${String(m+1).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
+    let cls='d'; const st=rqDayState(iso);
+    if(iso<todayISO()) cls+=' past';
+    else if(st==='booked') cls+=' booked';
+    else if(st==='buffer') cls+=' buffer';
+    if(rq.start&&rq.end&&iso>=rq.start&&iso<=rq.end) cls+=' range';
+    if(iso===rq.start||iso===rq.end) cls+=' sel';
+    cells+=`<div class="${cls}" onclick="rqClickDay('${iso}')">${dd}</div>`;
+  }
+  host.innerHTML=`<div class="rqcal">
+    <div class="nav"><button type="button" onclick="rqShift(-1)">‹</button><strong>${label}</strong><button type="button" onclick="rqShift(1)">›</button></div>
+    <div class="grid7">${['S','M','T','W','T','F','S'].map(d=>`<div class="dow">${d}</div>`).join('')}${cells}</div>
+  </div>`;
+}
+function rqShift(n){ rq.month.setMonth(rq.month.getMonth()+n); renderRqCal(); }
+function rqClickDay(iso){
+  if(iso<todayISO() || rqDayState(iso)!=='free') return;
+  if(!rq.start || (rq.start&&rq.end)){ rq.start=iso; rq.end=''; }
+  else if(iso<rq.start){ rq.start=iso; }
+  else{
+    for(let d=rq.start; d<=iso; d=addDays(d,1)){ if(rqDayState(d)!=='free'){ alert('There is an unavailable day inside that range — please choose a shorter range.'); return; } }
+    rq.end=iso;
+  }
+  renderRqCal(); renderRqSide();
+}
+function renderRqSide(){
+  const host=document.getElementById('rq_side'); if(!host) return;
+  const it=rq.item;
+  const hasRange=rq.start&&rq.end;
+  const days=hasRange? daysBetween(rq.start,rq.end)+1 : 0;
+  const e=hasRange? estimate(it,days,rq.method): null;
+  host.innerHTML=`
     <label class="f"><span class="lbl">Fulfilment</span>
-      <select id="rq_method" onchange="updEst()"><option>Standard</option><option>Express</option><option>Local Pickup</option></select></label>
-    <div class="est" id="rq_est"></div>
-    <div class="row2">
-      <label class="f"><span class="lbl">Full name *</span><input id="rq_name"></label>
-      <label class="f"><span class="lbl">Email *</span><input id="rq_email" type="email"></label>
+      <select id="rq_method" onchange="rq.method=this.value;renderRqSide()">
+        <option ${rq.method==='Standard'?'selected':''}>Standard</option>
+        <option ${rq.method==='Express'?'selected':''}>Express</option>
+        <option ${rq.method==='Local Pickup'?'selected':''}>Local Pickup</option>
+      </select></label>
+    <div class="est">
+      <div class="rate"><span>Dates</span><span>${hasRange?`${rq.start} → ${rq.end} <span class="note">(${days}d)</span>`:'<span class="note">pick on the calendar</span>'}</span></div>
+      ${e?`
+      <div class="rate"><span>Rental</span><span>${fmt(e.rental)}</span></div>
+      <div class="rate"><span>${esc(rq.method)} fulfilment</span><span>${fmt(e.shipping)}</span></div>
+      <div class="rate"><span>HST (${DATA.pricing.hstPct}%)</span><span>${fmt(e.hst)}</span></div>
+      <div class="rate"><span>Damage Protection Fee (${DATA.pricing.dpfPct}%)</span><span>${fmt(e.dpf)}</span></div>
+      <div class="rate"><span><b>Estimated total</b></span><span><b>${fmt(e.total)}</b></span></div>`:''}
     </div>
     <div class="row2">
-      <label class="f"><span class="lbl">Phone *</span><input id="rq_phone"></label>
-      <label class="f"><span class="lbl">City / Province *</span><input id="rq_city"></label>
+      <label class="f"><span class="lbl">Full name *</span><input id="rq_name" value="${esc(rq._name||'')}"></label>
+      <label class="f"><span class="lbl">Email *</span><input id="rq_email" type="email" value="${esc(rq._email||'')}"></label>
     </div>
-    <label class="f"><span class="lbl">Shipping address <span class="hint">(if delivery)</span></span><textarea id="rq_addr" rows="2"></textarea></label>
-    <label class="f"><span class="lbl">Message <span class="hint">(optional)</span></span><textarea id="rq_msg" rows="2" placeholder="Occasion, sizing questions…"></textarea></label>
-    <label class="check" style="margin-bottom:16px"><input type="checkbox" id="rq_ok"><span>I understand a non-refundable Damage Protection Fee applies and I'm liable for damage beyond normal wear. I've read the <a href="#" onclick="showTerms(event)">Terms</a>. No payment is taken now.</span></label>
-    <button class="btn block lg" onclick="submitRequest('${it.id}')">Send rental request</button>
-    <p class="note" style="margin-top:10px">This sends your request to Yíká${FORM_ENDPOINT?'':' via your email app'}. We'll reply to confirm.</p>
-  `);
-  document.getElementById('rq_days').value=sel.days;
-  updEst();
+    <div class="row2">
+      <label class="f"><span class="lbl">Phone *</span><input id="rq_phone" value="${esc(rq._phone||'')}"></label>
+      <label class="f"><span class="lbl">City / Province *</span><input id="rq_city" value="${esc(rq._city||'')}"></label>
+    </div>
+    <label class="f"><span class="lbl">Shipping address <span class="hint">(if delivery)</span></span><textarea id="rq_addr" rows="2">${esc(rq._addr||'')}</textarea></label>
+    <label class="f"><span class="lbl">Message <span class="hint">(optional)</span></span><textarea id="rq_msg" rows="2" placeholder="Occasion, sizing questions…">${esc(rq._msg||'')}</textarea></label>
+    <label class="check" style="margin-bottom:16px"><input type="checkbox" id="rq_ok" ${rq._ok?'checked':''}><span>I understand a non-refundable Damage Protection Fee applies and I'm liable for damage beyond normal wear. I've read the <a href="#" onclick="showTerms(event)">Terms</a>.</span></label>
+    <button class="btn block lg" id="rq_submit" onclick="submitBooking()">Request these dates</button>
+    <p class="note" style="margin-top:10px">No payment now. If we confirm, you'll get a secure Stripe link by email to pay and lock your dates.</p>`;
+  // keep typed values across re-renders
+  ['name','email','phone','city','addr','msg'].forEach(k=>{ const el=document.getElementById('rq_'+k); if(el) el.addEventListener('input',()=>{rq['_'+({addr:'addr',msg:'msg'}[k]||k)]=el.value;}); });
+  const ok=document.getElementById('rq_ok'); if(ok) ok.addEventListener('change',()=>rq._ok=ok.checked);
 }
-function updEst(){
-  const days=+document.getElementById('rq_days').value;
-  const method=document.getElementById('rq_method').value;
-  sel.days=days; sel.method=method; sel.start=document.getElementById('rq_start').value;
-  const e=estimate(sel.item,days,method);
-  document.getElementById('rq_est').innerHTML=`
-    <div class="rate"><span>Rental (${days} days)</span><span>${fmt(e.rental)}</span></div>
-    <div class="rate"><span>${esc(method)} fulfilment</span><span>${fmt(e.shipping)}</span></div>
-    <div class="rate"><span>HST (${DATA.pricing.hstPct}%)</span><span>${fmt(e.hst)}</span></div>
-    <div class="rate"><span>Damage Protection Fee (${DATA.pricing.dpfPct}%)</span><span>${fmt(e.dpf)}</span></div>
-    <div class="rate"><span><b>Estimated total</b></span><span><b>${fmt(e.total)}</b></span></div>
-    <div class="note" style="padding:6px 0 8px">Estimate only — confirmed by Yíká once availability is checked.</div>`;
-}
-function submitRequest(id){
-  const it=DATA.items.find(x=>x.id===id)||sel.item;
-  const g=x=>document.getElementById(x).value.trim();
-  const name=g('rq_name'), email=g('rq_email'), phone=g('rq_phone'), city=g('rq_city');
+async function submitBooking(){
+  const it=rq.item;
+  if(!rq.start||!rq.end){ alert('Please select your rental dates on the calendar.'); return; }
+  const g=x=>{const el=document.getElementById(x); return el?el.value.trim():'';};
+  const name=g('rq_name'), email=g('rq_email'), phone=g('rq_phone'), city=g('rq_city'), addr=g('rq_addr'), msg=g('rq_msg');
   if(!name||!email||!phone||!city){ alert('Please fill your name, email, phone and city/province.'); return; }
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ alert('Please enter a valid email.'); return; }
   if(!document.getElementById('rq_ok').checked){ alert('Please acknowledge the Damage Protection Fee and Terms.'); return; }
-  const e=estimate(it, sel.days, sel.method);
-  const payload={
-    item:it.name, brand:it.brand, itemId:it.id,
-    period_days:sel.days, preferred_start:g('rq_start')||'(not set)', fulfilment:sel.method,
-    estimated_rental:e.rental, estimated_total:e.total,
-    name, email, phone, city, address:g('rq_addr')||'(pickup / not given)', message:g('rq_msg')||'',
-    submitted:new Date().toLocaleString('en-CA')
-  };
-  if(FORM_ENDPOINT){
-    fetch(FORM_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)})
-      .then(r=>{ if(r.ok) successScreen(it); else throw 0; })
-      .catch(()=>{ mailtoFallback(it,payload); });
-  } else {
-    mailtoFallback(it,payload);
+  const days=daysBetween(rq.start,rq.end)+1;
+  const btn=document.getElementById('rq_submit'); if(btn){ btn.disabled=true; btn.textContent='Sending…'; }
+  const payload={ itemId:it.id, start:rq.start, end:rq.end, fulfilment:rq.method,
+    renter:{ name, email, phone, city, address:addr, message:msg } };
+  try{
+    const r=await fetch('/api/book',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const d=await r.json().catch(()=>({}));
+    if(r.ok && d.ok){ pendingScreen(it,d.ref); return; }
+    if(r.status===409){ alert(d.error||'Those dates are no longer available.'); if(btn){btn.disabled=false;btn.textContent='Request these dates';} await loadAvailability(it.id); return; }
+    throw new Error(d.error||('HTTP '+r.status));
+  }catch(err){
+    // backend not live yet → fall back to email request so nothing is lost
+    const e=estimate(it,days,rq.method);
+    mailtoFallback(it,{ item:it.name, brand:it.brand, itemId:it.id, period_days:days,
+      preferred_start:rq.start+' → '+rq.end, fulfilment:rq.method,
+      estimated_rental:e.rental, estimated_total:e.total,
+      name, email, phone, city, address:addr||'(pickup / not given)', message:msg||'',
+      submitted:new Date().toLocaleString('en-CA') });
   }
+}
+function pendingScreen(it,ref){
+  openModal(`<div style="text-align:center;padding:20px 6px 8px">
+    <div style="width:64px;height:64px;border-radius:999px;background:var(--sage);color:var(--sage-ink);display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 16px">✓</div>
+    <h2 style="font-size:24px">Request received</h2>
+    <p style="color:var(--ink-soft);max-width:46ch;margin:10px auto 0">Thanks — your request for <b>${esc(it.name)}</b>${ref?` (ref #${esc(String(ref))})`:''} is in. Your dates are held while we review. Once we confirm, you'll get a secure <b>Stripe</b> payment link by email to lock them in. No payment has been taken.</p>
+    <button class="btn lg" style="margin-top:20px" onclick="closeModal()">Back to collection</button>
+  </div>`);
 }
 function mailtoFallback(it,p){
   const body=
@@ -442,7 +548,7 @@ function mailtoFallback(it,p){
 Period: ${p.period_days} days
 Preferred start: ${p.preferred_start}
 Fulfilment: ${p.fulfilment}
-Estimated total: ${fmt(p.estimated_total)} (rental ${fmt(p.estimated_rental)}) 
+Estimated total: ${fmt(p.estimated_total)} (rental ${fmt(p.estimated_rental)})
 
 Name: ${p.name}
 Email: ${p.email}
