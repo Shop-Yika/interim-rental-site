@@ -12,20 +12,22 @@ module.exports = async (req, res) => {
       offset = data.offset;
       for (const r of data.records) {
         const f = r.fields;
-        // Image can come from an uploaded Attachment field (Image) OR a pasted link
-        // field (ImageURL / "Image URL" / ImageLink). Prefer the upload, fall back to the link.
-        let image = '';
+        // Images can come from an uploaded Attachment field (Image, supports multiple files)
+        // AND/OR a link field (ImageURL / "Image URL" / ImageLink), which may hold several
+        // links separated by commas or new lines. Uploads come first, then links.
+        let images = [];
         const att = f.Image;
-        if (Array.isArray(att)) image = (att[0] && att[0].url) || '';
-        else if (typeof att === 'string') image = att;
-        if (!image) {
-          const link = f.ImageURL || f['Image URL'] || f.ImageLink || '';
-          if (link) image = String(link).trim();
+        if (Array.isArray(att)) images = att.map(a => a && a.url).filter(Boolean);
+        else if (typeof att === 'string' && att.trim()) images = [att.trim()];
+        const linkRaw = f.ImageURL || f['Image URL'] || f.ImageLink || '';
+        if (linkRaw) {
+          String(linkRaw).split(/[\n,]+/).map(s => s.trim()).filter(Boolean)
+            .forEach(u => { if (!images.includes(u)) images.push(u); });
         }
         items.push({
           id: r.id, name: f.Name || '', brand: f.Brand || '', category: f.Category || '',
           size: f.Size || '', color: f.Color || '', rrp: f.RRP || 0, adjustPct: f.AdjustPct || 0,
-          image: image || ''
+          image: images[0] || '', images
         });
       }
     } while (offset);
