@@ -59,9 +59,13 @@
   .hero p{font-size:19px; color:#5f5c4d; max-width:34ch; margin:0 0 26px}
   .hero .hbtn{display:inline-block; background:var(--brand); color:#fff; border:0; padding:15px 28px; border-radius:6px; font-family:inherit; font-weight:700; letter-spacing:.09em; text-transform:uppercase; font-size:14px; cursor:pointer}
   .hero .hbtn:hover{background:var(--brand-hover)}
-  .hero-strip{display:flex; gap:4px; overflow-x:auto; background:var(--bg); scroll-snap-type:x proximity; -webkit-overflow-scrolling:touch}
+  .hero-strip{overflow:hidden; background:var(--bg)}
   .hero-strip::-webkit-scrollbar{height:0}
-  .hero-strip .tile{flex:0 0 clamp(280px,29vw,400px); height:clamp(360px,42vw,480px); background-size:cover; background-position:center; background-color:#e4ded2; scroll-snap-align:start}
+  .hero-track{display:flex; gap:4px; width:max-content; animation:heroScroll 60s linear infinite}
+  .hero-strip:hover .hero-track{animation-play-state:paused}
+  @keyframes heroScroll{from{transform:translateX(0)} to{transform:translateX(-50%)}}
+  @media(prefers-reduced-motion:reduce){ .hero-track{animation:none} .hero-strip{overflow-x:auto} }
+  .hero-strip .tile{flex:0 0 clamp(280px,29vw,400px); height:clamp(360px,42vw,480px); background-size:cover; background-position:center; background-color:#e4ded2}
   .hero-strip .tile.ph{background:linear-gradient(160deg,#e9e3d6,#e4dbea)}
   @media(max-width:760px){ .hero .wm{opacity:.45; width:70vw} .hero-strip .tile{flex-basis:74vw; height:300px} }
 
@@ -160,10 +164,40 @@
   .rqcal-legend{display:flex; gap:14px; font-size:11.5px; color:var(--muted); margin-top:8px; flex-wrap:wrap}
   .rqcal-legend i{display:inline-block; width:11px; height:11px; border-radius:3px; vertical-align:-1px; margin-right:5px}
   @media(max-width:700px){ .rqgrid{grid-template-columns:1fr} }
+
+  /* Extra product-card info */
+  .card .cmeta{font-size:12.5px; color:var(--ink-soft); margin-bottom:6px}
+  .card .cretail{font-size:12px; color:var(--muted); margin-top:5px}
+  .card .cretail s{color:var(--muted)}
+
+  /* Full-page product view (details + booking on one screen) */
+  .pv{display:none; padding:26px 0 64px}
+  .pv.open{display:block}
+  .pv .back{display:inline-flex; align-items:center; gap:7px; background:none; border:0; color:var(--brand); font-family:inherit; font-size:14px; font-weight:700; cursor:pointer; padding:6px 0; margin-bottom:18px}
+  .pv .back:hover{color:var(--brand-dark)}
+  .pv-top{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); gap:44px; align-items:start}
+  .pv-img{aspect-ratio:3/4; border-radius:18px; background:linear-gradient(160deg,var(--soft),#f3e6d9); display:flex; align-items:center; justify-content:center; overflow:hidden}
+  .pv-img img{width:100%; height:100%; object-fit:cover}
+  .pv-brand{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
+  .pv-name{font-size:clamp(28px,4vw,38px); margin:6px 0 8px}
+  .pv-meta{color:var(--ink-soft); font-size:14px; margin-bottom:6px}
+  .pv-retail{font-size:14px; color:var(--muted); margin-bottom:20px}
+  .pv-retail b{color:var(--ink); font-weight:700}
+  .pv-lbl{font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--brand); font-weight:700; margin-bottom:12px}
+  .pbanner{display:flex; gap:10px; align-items:center; background:var(--sage); color:var(--sage-ink); border-radius:12px; padding:12px 16px; font-size:14px; font-weight:500; margin-bottom:16px}
+  .pbanner svg{flex:0 0 auto}
+  .pcards{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+  .pcard{border:1px solid var(--line); border-radius:14px; padding:22px 16px; text-align:center; background:#fff}
+  .pcard .pd-days{font-size:17px; font-weight:700; color:var(--ink)}
+  .pcard .pd-price{font-size:26px; font-family:'Newsreader',Georgia,serif; margin:8px 0 6px}
+  .pcard .pd-sub{font-size:13px; color:var(--muted)}
+  .pcard .pd-save{color:var(--ok); font-weight:700}
+  .pv-book{margin-top:44px; border-top:1px solid var(--line); padding-top:34px}
+  .pv-book h3{font-size:24px; margin-bottom:4px}
+  @media(max-width:860px){ .pv-top{grid-template-columns:1fr; gap:26px} }
 </style>
 </head>
 <body>
-<div class="banner">Interim preview site · <b>request to rent</b> — our full booking experience is coming soon.</div>
 <header>
   <div class="wrap nav">
     <a href="#top" aria-label="Yíká home"><svg class="brandlogo" fill="#662762" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2447.43 1445.6">
@@ -186,6 +220,7 @@
 </header>
 
 <a id="top"></a>
+<div id="mainView">
 <section class="hero">
   <div class="wm"><svg class="wmk" fill="#efe7d4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1884.66 1855.75">
   
@@ -238,6 +273,9 @@
     </div>
   </div>
 </section>
+</div>
+
+<section class="pv" id="productView"><div class="wrap" id="pvBody"></div></section>
 
 <footer>
   <div class="wrap">
@@ -265,7 +303,7 @@
       <a href="#" onclick="showTerms(event)">Terms &amp; Damage Protection</a>
     </div>
   </div>
-  <div class="fbar"><div class="wrap"><span>© <span id="yr"></span> Yíká</span><span>Interim site — full booking coming soon.</span></div></div>
+  <div class="fbar"><div class="wrap"><span>© <span id="yr"></span> Yíká</span><span>Rent · Wear · Return</span></div></div>
 </footer>
 
 <div class="overlay" id="overlay"><div class="modal" id="modal"></div></div>
@@ -364,14 +402,80 @@ function render(){
   document.getElementById('countLabel').textContent=`Showing ${list.length} of ${DATA.items.length} pieces`;
   const g=document.getElementById('grid');
   if(!list.length){ g.innerHTML=`<div class="empty">No pieces match your filters.</div>`; return; }
-  g.innerHTML=list.map(i=>`<div class="card" onclick="openItem('${i.id}')">
+  g.innerHTML=list.map(i=>`<div class="card" onclick="openProduct('${i.id}')">
     <div class="ph">${i.image?`<img src="${esc(i.image)}" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'noimg',textContent:'Yíká'}))">`:`<div class="noimg">Yíká</div>`}</div>
     <div class="b">
       <div class="brand">${esc(i.brand||'')}</div>
       <div class="name">${esc(i.name)}</div>
+      <div class="cmeta">${[i.size&&('Size '+i.size), i.color].filter(Boolean).map(esc).join(' · ')}</div>
       <div class="price">From <b>${fmt(fromPrice(i))}</b> <span style="color:var(--muted)">/ ${d0} days</span></div>
+      ${i.rrp?`<div class="cretail">Retail <s>${fmt(i.rrp)}</s></div>`:''}
     </div>
   </div>`).join('');
+}
+
+/* ---------- full-page product view (details + price cards + booking) ---------- */
+function pvSavePct(item, d, baseDur){
+  const perD = rentalFee(item,d)/Math.max(d,1);
+  const per0 = rentalFee(item,baseDur)/Math.max(baseDur,1);
+  return per0>0 ? Math.round((1 - perD/per0)*100) : 0;
+}
+function openProduct(id){
+  const it=DATA.items.find(x=>x.id===id); if(!it) return;
+  const durs=(DATA.pricing.durations||[4,7,14,30]);
+  const base=durs[0];
+  // reset the shared request state used by the calendar + form
+  rq={ item:it, method:'Standard', start:'', end:'', ranges:[], bufferDays:(DATA.pricing&&DATA.pricing.bufferDays)||2, month:new Date(), _name:'',_email:'',_phone:'',_city:'',_addr:'',_msg:'',_ok:false };
+  rq.month.setDate(1);
+  const cards=durs.map(d=>{
+    const price=rentalFee(it,d), perDay=price/Math.max(d,1), save=pvSavePct(it,d,base);
+    return `<div class="pcard">
+      <div class="pd-days">${d} days</div>
+      <div class="pd-price">${fmt(price)}</div>
+      <div class="pd-sub">${fmt(perDay)}/day${save>0?` · <span class="pd-save">Save ${save}%</span>`:''}</div>
+    </div>`;
+  }).join('');
+  const meta=[it.category, it.size&&('Size '+it.size), it.color].filter(Boolean).map(esc).join(' · ');
+  const tag=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>`;
+  document.getElementById('pvBody').innerHTML=`
+    <button class="back" onclick="closeProduct()">&larr; Back to collection</button>
+    <div class="pv-top">
+      <div class="pv-img">${it.image?`<img src="${esc(it.image)}">`:`<div class="noimg" style="color:var(--brand);opacity:.5;font-size:13px;letter-spacing:.1em;text-transform:uppercase">Yíká</div>`}</div>
+      <div>
+        <div class="pv-brand">${esc(it.brand||'')}</div>
+        <h1 class="pv-name">${esc(it.name)}</h1>
+        <div class="pv-meta">${meta}</div>
+        ${it.rrp?`<div class="pv-retail">Retail value <b>${fmt(it.rrp)}</b> — rent it for a fraction below.</div>`:''}
+        <div class="pv-lbl">Rental period</div>
+        <div class="pbanner">${tag}<span>Longer rentals mean lower daily rates and bigger savings.</span></div>
+        <div class="pcards">${cards}</div>
+        <p class="note" style="margin-top:14px">No payment to request. We confirm availability, then email a secure Stripe link to pay. A non-refundable Damage Protection Fee applies.</p>
+      </div>
+    </div>
+    <div class="pv-book">
+      <h3>Pick your dates</h3>
+      <div class="note" style="margin-bottom:18px">Blocked days are already booked. Choose a start and end date to see your full estimate.</div>
+      <div class="rqgrid">
+        <div>
+          <div id="rq_cal"><div class="note" style="padding:20px 0">Loading availability…</div></div>
+          <div class="rqcal-legend">
+            <span><i style="background:var(--danger-bg)"></i>Booked</span>
+            <span><i style="background:#efe7d4"></i>Buffer</span>
+            <span><i style="background:var(--brand)"></i>Selected</span>
+          </div>
+        </div>
+        <div id="rq_side"></div>
+      </div>
+    </div>`;
+  document.getElementById('mainView').style.display='none';
+  document.getElementById('productView').classList.add('open');
+  window.scrollTo({top:0,behavior:'auto'});
+  renderRqSide();
+  loadAvailability(it.id);
+}
+function closeProduct(){
+  const pv=document.getElementById('productView'); if(pv) pv.classList.remove('open');
+  const mv=document.getElementById('mainView'); if(mv) mv.style.display='';
 }
 
 /* ---------- item detail + request ---------- */
@@ -524,7 +628,9 @@ async function submitBooking(){
     if(r.status===409){ alert(d.error||'Those dates are no longer available.'); if(btn){btn.disabled=false;btn.textContent='Request these dates';} await loadAvailability(it.id); return; }
     throw new Error(d.error||('HTTP '+r.status));
   }catch(err){
-    // backend not live yet → fall back to email request so nothing is lost
+    // backend errored → fall back to a background email request so nothing is lost
+    console.error('Booking API error:', err);
+    window._lastBookErr = String((err&&err.message)||err||'');
     const e=estimate(it,days,rq.method);
     mailtoFallback(it,{ item:it.name, brand:it.brand, itemId:it.id, period_days:days,
       preferred_start:rq.start+' → '+rq.end, fulfilment:rq.method,
@@ -538,10 +644,23 @@ function pendingScreen(it,ref){
     <div style="width:64px;height:64px;border-radius:999px;background:var(--sage);color:var(--sage-ink);display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 16px">✓</div>
     <h2 style="font-size:24px">Request received</h2>
     <p style="color:var(--ink-soft);max-width:46ch;margin:10px auto 0">Thanks — your request for <b>${esc(it.name)}</b>${ref?` (ref #${esc(String(ref))})`:''} is in. Your dates are held while we review. Once we confirm, you'll get a secure <b>Stripe</b> payment link by email to lock them in. No payment has been taken.</p>
-    <button class="btn lg" style="margin-top:20px" onclick="closeModal()">Back to collection</button>
+    <button class="btn lg" style="margin-top:20px" onclick="closeModal();closeProduct()">Back to collection</button>
   </div>`);
+  window._lastBookErr='';
 }
 function mailtoFallback(it,p){
+  // Preferred: deliver the request to admin@shopyika.com in the background via Formspree — no email app.
+  if(FORM_ENDPOINT){
+    const data={ _subject:'Rental request — '+p.item,
+      item:p.item, brand:p.brand, period_days:p.period_days, preferred_dates:p.preferred_start,
+      fulfilment:p.fulfilment, estimated_total:fmt(p.estimated_total), estimated_rental:fmt(p.estimated_rental),
+      name:p.name, email:p.email, phone:p.phone, city:p.city, address:p.address, message:p.message,
+      submitted:p.submitted };
+    fetch(FORM_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(data)}).catch(()=>{});
+    successScreen(it,false);
+    return;
+  }
+  // Last resort only if no form endpoint is configured.
   const body=
 `New rental request — ${p.item} (${p.brand})
 
@@ -565,8 +684,9 @@ function successScreen(it,mail){
   openModal(`<div style="text-align:center;padding:20px 6px 8px">
     <div style="width:64px;height:64px;border-radius:999px;background:var(--sage);color:var(--sage-ink);display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 16px">✓</div>
     <h2 style="font-size:24px">Request sent</h2>
-    <p style="color:var(--ink-soft);max-width:44ch;margin:10px auto 0">Thanks — your request for <b>${esc(it.name)}</b> is on its way${mail?' (check your email app opened up)':''}. We'll confirm availability and share a secure way to pay. No payment has been taken.</p>
-    <button class="btn lg" style="margin-top:20px" onclick="closeModal()">Back to collection</button>
+    <p style="color:var(--ink-soft);max-width:44ch;margin:10px auto 0">Thanks — your request for <b>${esc(it.name)}</b> is on its way${mail?' (check the email app that opened)':' — we’ll be in touch by email'}. We'll confirm availability and share a secure way to pay. No payment has been taken.</p>
+    <button class="btn lg" style="margin-top:20px" onclick="closeModal();closeProduct()">Back to collection</button>
+    ${window._lastBookErr?`<p class="note" style="margin-top:16px;opacity:.6">diagnostic: ${esc(window._lastBookErr)}</p>`:''}
   </div>`);
 }
 function showTerms(e){ if(e)e.preventDefault();
@@ -576,7 +696,13 @@ function showTerms(e){ if(e)e.preventDefault();
 }
 
 /* ---------- hero image strip (event photos, with graceful fallback) ---------- */
-function heroPlaceholders(strip,n){ strip.innerHTML=''; for(let i=0;i<n;i++){ const t=document.createElement('div'); t.className='tile ph'; strip.appendChild(t);} }
+function heroPlaceholders(strip,n){
+  strip.innerHTML='';
+  const track=document.createElement('div'); track.className='hero-track';
+  // two copies so the marquee loops seamlessly
+  for(let k=0;k<2;k++){ for(let i=0;i<n;i++){ const t=document.createElement('div'); t.className='tile ph'; track.appendChild(t);} }
+  strip.appendChild(track);
+}
 function initHero(){
   const strip=document.getElementById('heroStrip'); if(!strip)return;
   const srcs=Array.isArray(HERO_IMAGES)?HERO_IMAGES:[];
@@ -587,7 +713,10 @@ function initHero(){
     const list=srcs.filter(s=>good.includes(s));
     if(!list.length){ heroPlaceholders(strip,Math.max(srcs.length,5)); return; }
     strip.innerHTML='';
-    list.forEach(s=>{ const t=document.createElement('div'); t.className='tile'; t.style.backgroundImage=`url("${s}")`; strip.appendChild(t); });
+    const track=document.createElement('div'); track.className='hero-track';
+    // duplicate the set so the CSS marquee (translateX -50%) scrolls forever with no gap
+    for(let k=0;k<2;k++){ list.forEach(s=>{ const t=document.createElement('div'); t.className='tile'; t.style.backgroundImage=`url("${s}")`; track.appendChild(t); }); }
+    strip.appendChild(track);
   }
 }
 /* modal */

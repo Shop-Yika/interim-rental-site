@@ -28,7 +28,7 @@ module.exports = async (req, res) => {
     const q = quote(f.RRP, f.AdjustPct, days, fulfilment);
     const created = await at('Bookings', {
       method: 'POST',
-      body: JSON.stringify({ records: [{ fields: {
+      body: JSON.stringify({ typecast: true, records: [{ fields: {
         Item: [itemId], Start: start, End: end, Days: days, Fulfilment: fulfilment,
         Rental: q.rental, Shipping: q.shipping, HST: q.hst, DPF: q.dpf, Total: q.total,
         Name: renter.name, Email: renter.email, Phone: renter.phone,
