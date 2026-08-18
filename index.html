@@ -680,7 +680,11 @@ function renderSum(){
     <div style="font-weight:700;font-size:16px;margin:2px 0 12px">${esc(bk.item.name)}</div>
     <div class="rate"><span>Dates</span><span>${fmtLong(s)} → ${fmtLong(e)}</span></div>
     <div class="rate"><span>Duration</span><span>${bk.dur} days</span></div>
-    <div class="rate"><span>Fulfilment</span><span>${esc(bk.method)}</span></div>
+    <div class="bb-div" style="margin:10px 0"></div>
+    <div class="rate"><span>Rental (${bk.dur} days)</span><span>${fmt(est.rental)}</span></div>
+    <div class="rate"><span>${esc(bk.method)} fulfilment</span><span>${fmt(est.shipping)}</span></div>
+    <div class="rate"><span>HST (${DATA.pricing.hstPct}%)</span><span>${fmt(est.hst)}</span></div>
+    <div class="rate"><span>Damage Protection Fee (${DATA.pricing.dpfPct}%)</span><span>${fmt(est.dpf)}</span></div>
     <div class="rate"><span><b>Estimated total</b></span><span><b>${fmt(est.total)}</b></span></div>`;
 }
 function goRequest(){

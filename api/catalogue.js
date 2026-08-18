@@ -12,8 +12,16 @@ module.exports = async (req, res) => {
       offset = data.offset;
       for (const r of data.records) {
         const f = r.fields;
-        let image = f.Image;
-        if (Array.isArray(image)) image = (image[0] && image[0].url) || '';
+        // Image can come from an uploaded Attachment field (Image) OR a pasted link
+        // field (ImageURL / "Image URL" / ImageLink). Prefer the upload, fall back to the link.
+        let image = '';
+        const att = f.Image;
+        if (Array.isArray(att)) image = (att[0] && att[0].url) || '';
+        else if (typeof att === 'string') image = att;
+        if (!image) {
+          const link = f.ImageURL || f['Image URL'] || f.ImageLink || '';
+          if (link) image = String(link).trim();
+        }
         items.push({
           id: r.id, name: f.Name || '', brand: f.Brand || '', category: f.Category || '',
           size: f.Size || '', color: f.Color || '', rrp: f.RRP || 0, adjustPct: f.AdjustPct || 0,
