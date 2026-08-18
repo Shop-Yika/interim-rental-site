@@ -19,6 +19,7 @@
     --line:#ecdde8; --line-soft:#f6eef4;
     --brand:#662762; --brand-dark:#460F43; --brand-hover:#551f50;
     --soft:#F5DBEA; --sage:#EBEDD1; --sage-ink:#3c4a2a;
+    --char:#B5C63C; --char-soft:#EAEFC5; --char-border:#C7D45E; --char-ink:#2f3a12;
     --ok:#3c4a2a; --ok-bg:#EBEDD1; --danger:#8C1725; --danger-bg:#FBD1D0;
     --radius:16px; --shadow:0 1px 2px rgba(70,15,67,.05),0 10px 30px rgba(70,15,67,.08);
   }
@@ -170,31 +171,75 @@
   .card .cretail{font-size:12px; color:var(--muted); margin-top:5px}
   .card .cretail s{color:var(--muted)}
 
-  /* Full-page product view (details + booking on one screen) */
-  .pv{display:none; padding:26px 0 64px}
+  /* ---- Full-page product view (clean, compact) ---- */
+  .pv{display:none; padding:22px 0 60px}
   .pv.open{display:block}
-  .pv .back{display:inline-flex; align-items:center; gap:7px; background:none; border:0; color:var(--brand); font-family:inherit; font-size:14px; font-weight:700; cursor:pointer; padding:6px 0; margin-bottom:18px}
+  .pv .back{display:inline-flex; align-items:center; gap:7px; background:none; border:0; color:var(--brand); font-family:inherit; font-size:14px; font-weight:700; cursor:pointer; padding:4px 0; margin-bottom:14px}
   .pv .back:hover{color:var(--brand-dark)}
-  .pv-top{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); gap:44px; align-items:start}
-  .pv-img{aspect-ratio:3/4; border-radius:18px; background:linear-gradient(160deg,var(--soft),#f3e6d9); display:flex; align-items:center; justify-content:center; overflow:hidden}
+  .pv-top{display:grid; grid-template-columns:minmax(0,0.85fr) minmax(0,1fr); gap:36px; align-items:start}
+  .pv-img{aspect-ratio:3/4; border-radius:16px; background:linear-gradient(160deg,var(--soft),#f3e6d9); display:flex; align-items:center; justify-content:center; overflow:hidden; position:sticky; top:86px}
   .pv-img img{width:100%; height:100%; object-fit:cover}
   .pv-brand{font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
-  .pv-name{font-size:clamp(28px,4vw,38px); margin:6px 0 8px}
-  .pv-meta{color:var(--ink-soft); font-size:14px; margin-bottom:6px}
-  .pv-retail{font-size:14px; color:var(--muted); margin-bottom:20px}
+  .pv-name{font-size:clamp(24px,3vw,32px); margin:5px 0 6px}
+  .pv-meta{color:var(--ink-soft); font-size:13.5px}
+  .pv-retail{font-size:13px; color:var(--muted); margin:5px 0 16px}
   .pv-retail b{color:var(--ink); font-weight:700}
-  .pv-lbl{font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--brand); font-weight:700; margin-bottom:12px}
-  .pbanner{display:flex; gap:10px; align-items:center; background:var(--sage); color:var(--sage-ink); border-radius:12px; padding:12px 16px; font-size:14px; font-weight:500; margin-bottom:16px}
-  .pbanner svg{flex:0 0 auto}
-  .pcards{display:grid; grid-template-columns:1fr 1fr; gap:14px}
-  .pcard{border:1px solid var(--line); border-radius:14px; padding:22px 16px; text-align:center; background:#fff}
-  .pcard .pd-days{font-size:17px; font-weight:700; color:var(--ink)}
-  .pcard .pd-price{font-size:26px; font-family:'Newsreader',Georgia,serif; margin:8px 0 6px}
-  .pcard .pd-sub{font-size:13px; color:var(--muted)}
-  .pcard .pd-save{color:var(--ok); font-weight:700}
-  .pv-book{margin-top:44px; border-top:1px solid var(--line); padding-top:34px}
-  .pv-book h3{font-size:24px; margin-bottom:4px}
-  @media(max-width:860px){ .pv-top{grid-template-columns:1fr; gap:26px} }
+
+  /* buy box */
+  .buybox{border:1px solid var(--line); border-radius:16px; padding:18px; box-shadow:var(--shadow); background:#fff}
+  .bb-lbl{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--brand); font-weight:700; margin-bottom:10px}
+  .dur-row{display:grid; grid-template-columns:repeat(4,1fr); gap:8px}
+  .dur{border:1px solid var(--line); border-radius:12px; padding:11px 4px; text-align:center; cursor:pointer; transition:.12s; background:#fff}
+  .dur:hover{border-color:var(--brand)}
+  .dur.on{border-color:var(--char-border); background:var(--char-soft); box-shadow:inset 0 0 0 1px var(--char-border)}
+  .dur .dd{font-weight:700; font-size:14px}
+  .dur .dp{font-size:12px; color:var(--ink-soft); margin-top:3px}
+  .dur.on .dp{color:#4a5520}
+  .selline{font-size:13px; color:var(--ink-soft); margin:14px 0 2px; display:flex; justify-content:space-between; align-items:baseline}
+  .selline .save{color:var(--ok); font-weight:700}
+  .bb-div{height:1px; background:var(--line); margin:16px 0}
+  /* calendar */
+  .calbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px}
+  .calbar button{background:#fff; border:1px solid var(--line); border-radius:9px; width:30px; height:30px; cursor:pointer; font-size:16px; line-height:1; color:var(--brand)}
+  .calbar button:disabled{opacity:.35; cursor:not-allowed; color:var(--muted)}
+  .cal2{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+  .cal .chd{margin-bottom:6px; text-align:center}
+  .cal .chd strong{font-size:13px}
+  .g7{display:grid; grid-template-columns:repeat(7,1fr); gap:2px}
+  .g7 .dow{font-size:9.5px; text-transform:uppercase; color:var(--muted); text-align:center; padding-bottom:3px}
+  .cell{aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; font-size:12px; border-radius:8px; color:var(--ink)}
+  .cell.blank{visibility:hidden}
+  .cell.free{cursor:pointer; background:var(--paper)}
+  .cell.free:hover{background:var(--char-soft)}
+  .cell.off{color:#c9bcc6; background:#eee6ec; cursor:not-allowed; text-decoration:line-through; text-decoration-thickness:1px}
+  .cell.sbuf{background:var(--char-soft); color:#6f7a3a; font-weight:600; cursor:pointer}
+  .cell.rental{background:var(--char); color:var(--char-ink); font-weight:700; cursor:pointer}
+  .cal-legend{display:flex; gap:12px; flex-wrap:wrap; font-size:11px; color:var(--muted); margin-top:12px}
+  .cal-legend i{display:inline-block; width:11px; height:11px; border-radius:3px; vertical-align:-1px; margin-right:5px}
+  /* stepper */
+  .stepbar{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:14px; background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:8px 10px}
+  .stepbar button{background:#fff; border:1px solid var(--line); border-radius:9px; padding:7px 12px; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; color:var(--brand)}
+  .stepbar button:disabled{opacity:.4; cursor:not-allowed; color:var(--muted)}
+  .stepbar .rng{font-size:13.5px; font-weight:700; text-align:center; flex:1}
+  .stepbar .rng small{display:block; font-weight:400; color:var(--muted); font-size:11px}
+  /* windows list */
+  .wins-h{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--brand); font-weight:700; margin:18px 0 8px}
+  .wins{max-height:186px; overflow:auto; display:flex; flex-direction:column; gap:6px; padding-right:2px}
+  .win{display:flex; justify-content:space-between; align-items:center; padding:9px 12px; border:1px solid var(--line); border-radius:10px; cursor:pointer; font-size:13px; transition:.12s}
+  .win:hover{border-color:var(--char-border); background:var(--paper)}
+  .win.on{border-color:var(--char-border); background:var(--char-soft)}
+  .win .wd{font-weight:700}
+  .win .wr{color:var(--ink-soft)}
+  .nowins{font-size:13.5px; color:var(--ink-soft); background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:16px; text-align:center}
+  .bb-est{background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:4px 14px; margin:16px 0 14px}
+  .bb-est .rate{font-size:13.5px}
+  /* request-details section */
+  .pv-book{margin-top:40px; border-top:1px solid var(--line); padding-top:28px; display:none}
+  .pv-book.show{display:block}
+  .pv-book h3{font-size:22px; margin-bottom:4px}
+  .reqgrid{display:grid; grid-template-columns:1fr 1.1fr; gap:28px; align-items:start}
+  .reqsum{background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:16px 18px; position:sticky; top:86px}
+  @media(max-width:860px){ .pv-top{grid-template-columns:1fr; gap:22px} .pv-img{position:static} .cal2{grid-template-columns:1fr} .reqgrid{grid-template-columns:1fr} .reqsum{position:static} }
 </style>
 </head>
 <body>
@@ -414,29 +459,48 @@ function render(){
   </div>`).join('');
 }
 
-/* ---------- full-page product view (details + price cards + booking) ---------- */
+/* ===================================================================
+   Full-page product view — duration-based booking (PRD calendar)
+   =================================================================== */
+let bk = {};
 function pvSavePct(item, d, baseDur){
   const perD = rentalFee(item,d)/Math.max(d,1);
   const per0 = rentalFee(item,baseDur)/Math.max(baseDur,1);
   return per0>0 ? Math.round((1 - perD/per0)*100) : 0;
 }
+const ROLL_MONTHS = 6;                 // rolling window length
+function bkState(iso){
+  if(iso < todayISO()) return 'past';
+  const buf = bk.buffer||0;
+  for(const r of bk.ranges){ if(iso>=r.start && iso<=r.end) return 'booked'; }
+  for(const r of bk.ranges){ if(iso>=addDays(r.start,-buf) && iso<=addDays(r.end,buf)) return 'buffer'; }
+  return 'free';
+}
+function validStart(iso){
+  if(iso < todayISO()) return false;
+  const end = addDays(iso, bk.dur-1);
+  if(end > bk.winEnd) return false;
+  for(let d=iso; d<=end; d=addDays(d,1)){ if(bkState(d)!=='free') return false; }
+  return true;
+}
+function computeBlocks(){
+  const out=[]; const lastStart=addDays(bk.winEnd, -(bk.dur-1));
+  let d=todayISO(), guard=0;
+  while(d<=lastStart && guard++<1000){ if(validStart(d)) out.push(d); d=addDays(d,1); }
+  bk.blocks=out;
+}
+function fmtShort(iso){ return new Date(iso+'T00:00:00').toLocaleDateString('en-CA',{month:'short',day:'numeric'}); }
+function fmtLong(iso){ return new Date(iso+'T00:00:00').toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric'}); }
+
 function openProduct(id){
   const it=DATA.items.find(x=>x.id===id); if(!it) return;
   const durs=(DATA.pricing.durations||[4,7,14,30]);
-  const base=durs[0];
-  // reset the shared request state used by the calendar + form
-  rq={ item:it, method:'Standard', start:'', end:'', ranges:[], bufferDays:(DATA.pricing&&DATA.pricing.bufferDays)||2, month:new Date(), _name:'',_email:'',_phone:'',_city:'',_addr:'',_msg:'',_ok:false };
-  rq.month.setDate(1);
-  const cards=durs.map(d=>{
-    const price=rentalFee(it,d), perDay=price/Math.max(d,1), save=pvSavePct(it,d,base);
-    return `<div class="pcard">
-      <div class="pd-days">${d} days</div>
-      <div class="pd-price">${fmt(price)}</div>
-      <div class="pd-sub">${fmt(perDay)}/day${save>0?` · <span class="pd-save">Save ${save}%</span>`:''}</div>
-    </div>`;
-  }).join('');
+  const first=new Date(); first.setDate(1); first.setHours(0,0,0,0);
+  const winEndD=new Date(first.getFullYear(), first.getMonth()+ROLL_MONTHS, 0); // last day of the window
+  bk={ item:it, durs, dur:durs[0], ranges:[], buffer:(DATA.pricing&&DATA.pricing.bufferDays)||2,
+       view:new Date(first), viewMin:new Date(first), viewMax:new Date(first.getFullYear(), first.getMonth()+ROLL_MONTHS-2, 1),
+       winEnd:winEndD.toISOString().slice(0,10), blocks:[], selIdx:-1, method:'Standard' };
   const meta=[it.category, it.size&&('Size '+it.size), it.color].filter(Boolean).map(esc).join(' · ');
-  const tag=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>`;
   document.getElementById('pvBody').innerHTML=`
     <button class="back" onclick="closeProduct()">&larr; Back to collection</button>
     <div class="pv-top">
@@ -445,37 +509,208 @@ function openProduct(id){
         <div class="pv-brand">${esc(it.brand||'')}</div>
         <h1 class="pv-name">${esc(it.name)}</h1>
         <div class="pv-meta">${meta}</div>
-        ${it.rrp?`<div class="pv-retail">Retail value <b>${fmt(it.rrp)}</b> — rent it for a fraction below.</div>`:''}
-        <div class="pv-lbl">Rental period</div>
-        <div class="pbanner">${tag}<span>Longer rentals mean lower daily rates and bigger savings.</span></div>
-        <div class="pcards">${cards}</div>
-        <p class="note" style="margin-top:14px">No payment to request. We confirm availability, then email a secure Stripe link to pay. A non-refundable Damage Protection Fee applies.</p>
+        ${it.rrp?`<div class="pv-retail">Retail value <b>${fmt(it.rrp)}</b></div>`:''}
+        <div class="buybox">
+          <div class="bb-lbl">Rental length</div>
+          <div class="dur-row" id="bkChips"></div>
+          <div class="selline" id="bkSel"></div>
+          <div class="bb-div"></div>
+          <div class="bb-lbl">Choose your dates</div>
+          <div id="bkCal"><div class="note" style="padding:16px 0">Loading availability…</div></div>
+          <div class="cal-legend">
+            <span><i style="background:var(--char)"></i>Rental days</span>
+            <span><i style="background:var(--char-soft);border:1px solid var(--char-border)"></i>Buffer (2 days)</span>
+            <span><i style="background:var(--paper);border:1px solid var(--line)"></i>Available</span>
+            <span><i style="background:#eee6ec"></i>Unavailable</span>
+          </div>
+          <div class="stepbar" id="bkStep"></div>
+          <div class="wins-h">Upcoming windows</div>
+          <div id="bkList"></div>
+          <div class="bb-est" id="bkEst"></div>
+          <button class="btn block lg" id="bkReq" onclick="goRequest()">Request these dates</button>
+          <p class="note" style="margin-top:10px">No payment now. We confirm availability, then email a secure Stripe link to pay. A non-refundable Damage Protection Fee applies.</p>
+        </div>
       </div>
     </div>
-    <div class="pv-book">
-      <h3>Pick your dates</h3>
-      <div class="note" style="margin-bottom:18px">Blocked days are already booked. Choose a start and end date to see your full estimate.</div>
-      <div class="rqgrid">
+    <div class="pv-book" id="pvBook">
+      <h3>Your details</h3>
+      <div class="note" style="margin-bottom:18px">We'll use these to confirm your rental and send a secure pay link.</div>
+      <div class="reqgrid">
+        <div class="reqsum" id="reqSum"></div>
         <div>
-          <div id="rq_cal"><div class="note" style="padding:20px 0">Loading availability…</div></div>
-          <div class="rqcal-legend">
-            <span><i style="background:var(--danger-bg)"></i>Booked</span>
-            <span><i style="background:#efe7d4"></i>Buffer</span>
-            <span><i style="background:var(--brand)"></i>Selected</span>
+          <div class="row2">
+            <label class="f"><span class="lbl">Full name *</span><input id="rq_name"></label>
+            <label class="f"><span class="lbl">Email *</span><input id="rq_email" type="email"></label>
           </div>
+          <div class="row2">
+            <label class="f"><span class="lbl">Phone *</span><input id="rq_phone"></label>
+            <label class="f"><span class="lbl">City / Province *</span><input id="rq_city"></label>
+          </div>
+          <label class="f"><span class="lbl">Shipping address <span class="hint">(if delivery)</span></span><textarea id="rq_addr" rows="2"></textarea></label>
+          <label class="f"><span class="lbl">Message <span class="hint">(optional)</span></span><textarea id="rq_msg" rows="2" placeholder="Occasion, sizing questions…"></textarea></label>
+          <label class="f"><span class="lbl">Fulfilment</span>
+            <select id="rq_method" onchange="bk.method=this.value; renderEst(); renderSum()">
+              <option>Standard</option><option>Express</option><option>Local Pickup</option>
+            </select></label>
+          <label class="check" style="margin-bottom:16px"><input type="checkbox" id="rq_ok"><span>I understand a non-refundable Damage Protection Fee applies and I'm liable for damage beyond normal wear. I've read the <a href="#" onclick="showTerms(event)">Terms</a>.</span></label>
+          <button class="btn block lg" onclick="submitRequest()">Request these dates</button>
         </div>
-        <div id="rq_side"></div>
       </div>
     </div>`;
   document.getElementById('mainView').style.display='none';
   document.getElementById('productView').classList.add('open');
   window.scrollTo({top:0,behavior:'auto'});
-  renderRqSide();
-  loadAvailability(it.id);
+  loadItemAvailability(it.id);
 }
 function closeProduct(){
   const pv=document.getElementById('productView'); if(pv) pv.classList.remove('open');
   const mv=document.getElementById('mainView'); if(mv) mv.style.display='';
+  const bkb=document.getElementById('pvBook'); if(bkb) bkb.classList.remove('show');
+}
+async function loadItemAvailability(id){
+  try{ const r=await fetch('/api/availability?item='+encodeURIComponent(id),{cache:'no-store'});
+    if(r.ok){ const d=await r.json(); bk.ranges=d.ranges||[]; if(d.bufferDays!=null) bk.buffer=d.bufferDays; } }
+  catch(e){ bk.ranges=[]; }
+  selectDuration(bk.dur);
+}
+function selectDuration(dur){
+  bk.dur=dur; computeBlocks();
+  bk.selIdx = bk.blocks.length? 0 : -1;
+  if(bk.selIdx>=0) setViewToSel();
+  renderBooking();
+}
+function setViewToSel(){
+  if(bk.selIdx<0) return;
+  const s=bk.blocks[bk.selIdx], dt=new Date(s+'T00:00:00');
+  let v=new Date(dt.getFullYear(), dt.getMonth(), 1);
+  if(v<bk.viewMin) v=new Date(bk.viewMin);
+  if(v>bk.viewMax) v=new Date(bk.viewMax);
+  bk.view=v;
+}
+function renderBooking(){ renderChips(); renderSel(); renderCal(); renderStep(); renderList(); renderEst(); renderSum(); }
+function renderChips(){
+  const host=document.getElementById('bkChips'); if(!host) return;
+  host.innerHTML=bk.durs.map(d=>`<div class="dur ${d===bk.dur?'on':''}" onclick="selectDuration(${d})">
+    <div class="dd">${d} days</div><div class="dp">${fmt(rentalFee(bk.item,d))}</div></div>`).join('');
+}
+function renderSel(){
+  const host=document.getElementById('bkSel'); if(!host) return;
+  const d=bk.dur, per=rentalFee(bk.item,d)/Math.max(d,1), base=bk.durs[0], save=pvSavePct(bk.item,d,base);
+  host.innerHTML=`<span>${fmt(per)}/day</span>${save>0?`<span class="save">Save ${save}% vs ${base}-day</span>`:'<span></span>'}`;
+}
+function monthGrid(view){
+  const y=view.getFullYear(), m=view.getMonth();
+  const lead=new Date(y,m,1).getDay(), dim=new Date(y,m+1,0).getDate();
+  const label=new Date(y,m,1).toLocaleString('en-CA',{month:'long',year:'numeric'});
+  const s=bk.selIdx>=0?bk.blocks[bk.selIdx]:null, e=s?addDays(s,bk.dur-1):null;
+  const bs=s?addDays(s,-bk.buffer):null, be=s?addDays(e,bk.buffer):null;
+  let cells='';
+  for(let i=0;i<lead;i++) cells+=`<div class="cell blank"></div>`;
+  for(let dd=1;dd<=dim;dd++){
+    const iso=`${y}-${String(m+1).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
+    const st=bkState(iso); let cls='cell';
+    if(st!=='free') cls+=' off';
+    else if(s && iso>=s && iso<=e) cls+=' rental';
+    else if(s && iso>=bs && iso<=be) cls+=' sbuf';
+    else cls+=' free';
+    cells+=`<div class="${cls}" ${st==='free'?`onclick="clickDay('${iso}')"`:''}>${dd}</div>`;
+  }
+  return `<div class="cal"><div class="chd"><strong>${label}</strong></div>
+    <div class="g7">${['S','M','T','W','T','F','S'].map(x=>`<div class="dow">${x}</div>`).join('')}${cells}</div></div>`;
+}
+function renderCal(){
+  const host=document.getElementById('bkCal'); if(!host) return;
+  if(!bk.blocks.length){ host.innerHTML=`<div class="nowins">No ${bk.dur}-day rental windows available in the next ${ROLL_MONTHS} months. Try a shorter duration.</div>`; return; }
+  const atMin=(bk.view.getFullYear()===bk.viewMin.getFullYear() && bk.view.getMonth()===bk.viewMin.getMonth());
+  const atMax=(bk.view.getFullYear()===bk.viewMax.getFullYear() && bk.view.getMonth()===bk.viewMax.getMonth());
+  const v2=new Date(bk.view.getFullYear(), bk.view.getMonth()+1, 1);
+  host.innerHTML=`
+    <div class="calbar">
+      <button onclick="calMove(-1)" ${atMin?'disabled':''} aria-label="Earlier months">‹</button>
+      <button onclick="calMove(1)" ${atMax?'disabled':''} aria-label="Later months">›</button>
+    </div>
+    <div class="cal2">${monthGrid(bk.view)}${monthGrid(v2)}</div>`;
+}
+function calMove(n){
+  const v=new Date(bk.view.getFullYear(), bk.view.getMonth()+n, 1);
+  if(v<bk.viewMin||v>bk.viewMax) return;
+  bk.view=v; renderCal();
+}
+function renderStep(){
+  const host=document.getElementById('bkStep'); if(!host) return;
+  if(bk.selIdx<0){ host.innerHTML=`<div class="rng">No dates selected</div>`; return; }
+  const s=bk.blocks[bk.selIdx], e=addDays(s,bk.dur-1);
+  host.innerHTML=`
+    <button onclick="stepBlock(-1)" ${bk.selIdx<=0?'disabled':''}>‹ Earlier</button>
+    <div class="rng">${fmtShort(s)} – ${fmtShort(e)}<small>${bk.dur}-day rental${bk.selIdx>=bk.blocks.length-1?' · last window':''}</small></div>
+    <button onclick="stepBlock(1)" ${bk.selIdx>=bk.blocks.length-1?'disabled':''}>Later ›</button>`;
+}
+function stepBlock(n){ const i=bk.selIdx+n; if(i<0||i>=bk.blocks.length) return; bk.selIdx=i; setViewToSel(); renderCal(); renderStep(); renderList(); renderEst(); renderSum(); }
+function clickDay(iso){
+  let idx=bk.blocks.indexOf(iso);
+  if(idx<0) idx=bk.blocks.findIndex(b=>b>=iso);   // skip to next valid block on/after the clicked day
+  if(idx<0) return;
+  bk.selIdx=idx; setViewToSel(); renderCal(); renderStep(); renderList(); renderEst(); renderSum();
+}
+function renderList(){
+  const host=document.getElementById('bkList'); if(!host) return;
+  if(!bk.blocks.length){ host.innerHTML=`<div class="nowins">No ${bk.dur}-day windows available. Try another duration.</div>`; return; }
+  const rows=bk.blocks.slice(0,40).map((s,i)=>`<div class="win ${i===bk.selIdx?'on':''}" onclick="pickBlock(${i})">
+    <span class="wd">${bk.dur}-Day Rental</span><span class="wr">${fmtShort(s)} – ${fmtShort(addDays(s,bk.dur-1))}</span></div>`).join('');
+  host.innerHTML=`<div class="wins">${rows}</div>`;
+}
+function pickBlock(i){ if(i<0||i>=bk.blocks.length) return; bk.selIdx=i; setViewToSel(); renderCal(); renderStep(); renderList(); renderEst(); renderSum(); }
+function renderEst(){
+  const host=document.getElementById('bkEst'); if(!host) return;
+  if(bk.selIdx<0){ host.innerHTML=`<div class="rate"><span class="note">Pick a duration and window to see your estimate.</span></div>`; return; }
+  const e=estimate(bk.item,bk.dur,bk.method);
+  host.innerHTML=`
+    <div class="rate"><span>Rental (${bk.dur} days)</span><span>${fmt(e.rental)}</span></div>
+    <div class="rate"><span>${esc(bk.method)} fulfilment</span><span>${fmt(e.shipping)}</span></div>
+    <div class="rate"><span>HST (${DATA.pricing.hstPct}%)</span><span>${fmt(e.hst)}</span></div>
+    <div class="rate"><span>Damage Protection (${DATA.pricing.dpfPct}%)</span><span>${fmt(e.dpf)}</span></div>
+    <div class="rate"><span><b>Estimated total</b></span><span><b>${fmt(e.total)}</b></span></div>`;
+}
+function renderSum(){
+  const host=document.getElementById('reqSum'); if(!host) return;
+  if(bk.selIdx<0){ host.innerHTML=`<div class="note">No dates selected yet.</div>`; return; }
+  const s=bk.blocks[bk.selIdx], e=addDays(s,bk.dur-1), est=estimate(bk.item,bk.dur,bk.method);
+  host.innerHTML=`
+    <div class="pv-brand">${esc(bk.item.brand||'')}</div>
+    <div style="font-weight:700;font-size:16px;margin:2px 0 12px">${esc(bk.item.name)}</div>
+    <div class="rate"><span>Dates</span><span>${fmtLong(s)} → ${fmtLong(e)}</span></div>
+    <div class="rate"><span>Duration</span><span>${bk.dur} days</span></div>
+    <div class="rate"><span>Fulfilment</span><span>${esc(bk.method)}</span></div>
+    <div class="rate"><span><b>Estimated total</b></span><span><b>${fmt(est.total)}</b></span></div>`;
+}
+function goRequest(){
+  if(bk.selIdx<0){ alert('Please choose a rental length and an available date window first.'); return; }
+  const b=document.getElementById('pvBook'); b.classList.add('show'); renderSum();
+  b.scrollIntoView({behavior:'smooth'});
+}
+async function submitRequest(){
+  if(bk.selIdx<0){ alert('Please choose an available date window first.'); return; }
+  const it=bk.item, start=bk.blocks[bk.selIdx], end=addDays(start,bk.dur-1);
+  const g=x=>{const el=document.getElementById(x); return el?el.value.trim():'';};
+  const name=g('rq_name'), email=g('rq_email'), phone=g('rq_phone'), city=g('rq_city'), addr=g('rq_addr'), msg=g('rq_msg');
+  if(!name||!email||!phone||!city){ alert('Please fill your name, email, phone and city/province.'); return; }
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ alert('Please enter a valid email.'); return; }
+  if(!document.getElementById('rq_ok').checked){ alert('Please acknowledge the Damage Protection Fee and Terms.'); return; }
+  const payload={ itemId:it.id, start, end, fulfilment:bk.method, renter:{ name, email, phone, city, address:addr, message:msg } };
+  try{
+    const r=await fetch('/api/book',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const d=await r.json().catch(()=>({}));
+    if(r.ok && d.ok){ pendingScreen(it,d.ref); return; }
+    if(r.status===409){ alert(d.error||'Those dates are no longer available.'); await loadItemAvailability(it.id); return; }
+    throw new Error(d.error||('HTTP '+r.status));
+  }catch(err){
+    console.error('Booking API error:', err);
+    window._lastBookErr=String((err&&err.message)||err||'');
+    const e=estimate(it,bk.dur,bk.method);
+    mailtoFallback(it,{ item:it.name, brand:it.brand, itemId:it.id, period_days:bk.dur,
+      preferred_start:start+' → '+end, fulfilment:bk.method, estimated_rental:e.rental, estimated_total:e.total,
+      name, email, phone, city, address:addr||'(pickup / not given)', message:msg||'', submitted:new Date().toLocaleString('en-CA') });
+  }
 }
 
 /* ---------- item detail + request ---------- */
