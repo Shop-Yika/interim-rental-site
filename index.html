@@ -63,13 +63,15 @@
   .hbtns{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
   .hero .hbtn.alt{background:transparent; color:var(--brand); border:1px solid var(--brand); display:inline-flex; align-items:center; text-decoration:none}
   .hero .hbtn.alt:hover{background:var(--soft); color:var(--brand-dark)}
-  .hero-strip{position:relative; overflow:hidden; height:clamp(360px,44vw,580px); background:#e4ded2}
-  .heroslide{position:absolute; inset:0; background-size:cover; background-position:center; opacity:0; transition:opacity 1.8s ease}
-  .heroslide.on{opacity:1}
-  .heroslide.ph{background:linear-gradient(160deg,#e9e3d6,#e4dbea); opacity:1}
-  @media(prefers-reduced-motion:reduce){ .heroslide{transition:none} }
+  .hero-strip{overflow:hidden; background:var(--bg)}
+  .hero-strip::-webkit-scrollbar{height:0}
+  .hero-track{display:flex; gap:4px; width:max-content; animation:heroScroll 60s linear infinite}
+  .hero-strip:hover .hero-track{animation-play-state:paused}
+  @keyframes heroScroll{from{transform:translateX(0)} to{transform:translateX(-50%)}}
+  @media(prefers-reduced-motion:reduce){ .hero-track{animation:none} .hero-strip{overflow-x:auto} }
+  .hero-strip .tile{flex:0 0 clamp(280px,29vw,400px); height:clamp(360px,42vw,480px); background-size:cover; background-position:center; background-color:#e4ded2}
   .hero-strip .tile.ph{background:linear-gradient(160deg,#e9e3d6,#e4dbea)}
-  @media(max-width:760px){ .hero .wm{opacity:.3; width:70vw} .hero-strip{height:320px} }
+  @media(max-width:760px){ .hero .wm{opacity:.3; width:70vw} .hero-strip .tile{flex-basis:74vw; height:300px} }
 
   /* Values strip */
   .strip{background:var(--brand-dark); color:#f4e9f0}
@@ -92,6 +94,12 @@
 
   /* Grid */
   .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px}
+  .track{display:flex; gap:10px; overflow-x:auto; scroll-snap-type:x proximity; padding:2px 2px 14px; -webkit-overflow-scrolling:touch}
+  .track::-webkit-scrollbar{height:6px}
+  .track::-webkit-scrollbar-thumb{background:var(--line); border-radius:4px}
+  .track .card{flex:0 0 212px; scroll-snap-align:start}
+  .track .empty{flex:1 0 100%}
+  @media(max-width:560px){ .track .card{flex-basis:60vw} }
   .card{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; cursor:pointer; transition:.18s; box-shadow:var(--shadow)}
   .card:hover{transform:translateY(-3px)}
   .card .ph{aspect-ratio:3/4; background:linear-gradient(160deg,var(--soft),#f3e6d9); position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden}
@@ -320,7 +328,7 @@
     </div>
     <div id="newWrap" style="display:none">
       <div class="secttl">New arrivals</div>
-      <div class="grid" id="gridNew"></div>
+      <div class="track" id="gridNew"></div>
     </div>
     <div class="secttl">All products <span id="countLabel" class="cnt"></span></div>
     <div class="grid" id="grid"></div>
@@ -977,25 +985,27 @@ function showTerms(e){ if(e)e.preventDefault();
 }
 
 /* ---------- hero image strip (event photos, with graceful fallback) ---------- */
-function heroPlaceholders(strip){
-  strip.innerHTML=''; const el=document.createElement('div'); el.className='heroslide ph on'; strip.appendChild(el);
+function heroPlaceholders(strip,n){
+  strip.innerHTML='';
+  const track=document.createElement('div'); track.className='hero-track';
+  // two copies so the marquee loops seamlessly
+  for(let k=0;k<2;k++){ for(let i=0;i<n;i++){ const t=document.createElement('div'); t.className='tile ph'; track.appendChild(t);} }
+  strip.appendChild(track);
 }
 function initHero(){
   const strip=document.getElementById('heroStrip'); if(!strip)return;
   const srcs=Array.isArray(HERO_IMAGES)?HERO_IMAGES:[];
-  if(!srcs.length){ heroPlaceholders(strip); return; }
+  if(!srcs.length){ heroPlaceholders(strip,5); return; }
   const good=[]; let done=0;
   srcs.forEach(s=>{ const im=new Image(); im.onload=()=>{good.push(s); tick();}; im.onerror=tick; im.src=s; });
   function tick(){ if(++done!==srcs.length) return;
     const list=srcs.filter(s=>good.includes(s));
-    if(!list.length){ heroPlaceholders(strip); return; }
+    if(!list.length){ heroPlaceholders(strip,Math.max(srcs.length,5)); return; }
     strip.innerHTML='';
-    // stacked full-width slides that slowly crossfade
-    list.forEach((s,i)=>{ const el=document.createElement('div'); el.className='heroslide'+(i===0?' on':''); el.style.backgroundImage=`url("${s}")`; strip.appendChild(el); });
-    if(list.length>1){
-      let idx=0;
-      setInterval(()=>{ const sl=strip.querySelectorAll('.heroslide'); sl[idx].classList.remove('on'); idx=(idx+1)%sl.length; sl[idx].classList.add('on'); }, 5000);
-    }
+    const track=document.createElement('div'); track.className='hero-track';
+    // duplicate the set so the CSS marquee (translateX -50%) scrolls forever with no gap
+    for(let k=0;k<2;k++){ list.forEach(s=>{ const t=document.createElement('div'); t.className='tile'; t.style.backgroundImage=`url("${s}")`; track.appendChild(t); }); }
+    strip.appendChild(track);
   }
 }
 /* modal */
