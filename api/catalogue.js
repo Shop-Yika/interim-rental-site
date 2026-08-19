@@ -27,7 +27,8 @@ module.exports = async (req, res) => {
         items.push({
           id: r.id, name: f.Name || '', brand: f.Brand || '', category: f.Category || '',
           size: f.Size || '', color: f.Color || '', rrp: f.RRP || 0, adjustPct: f.AdjustPct || 0,
-          image: images[0] || '', images
+          image: images[0] || '', images,
+          newArrival: !!(f.NewArrival || f['New Arrival'] || f.New)
         });
       }
     } while (offset);

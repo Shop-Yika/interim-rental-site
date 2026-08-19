@@ -41,40 +41,35 @@
   .pill{display:inline-block; font-size:12px; padding:4px 12px; border-radius:999px; background:var(--soft); color:var(--brand-dark)}
 
   /* Header */
-  header{position:sticky; top:0; z-index:40; background:rgba(255,253,247,.9); backdrop-filter:saturate(1.2) blur(8px); border-bottom:1px solid var(--line)}
+  header{position:sticky; top:0; z-index:40; background:rgba(255,253,247,.9); backdrop-filter:saturate(1.2) blur(8px)}
   .nav{display:flex; align-items:center; justify-content:space-between; height:70px}
   .nav .links{display:flex; gap:26px; align-items:center; font-size:14px; letter-spacing:.02em}
   .nav .links a{color:var(--ink); text-transform:uppercase; font-size:13px; letter-spacing:.09em}
   .nav .links a:hover{color:var(--brand)}
   @media(max-width:760px){ .nav .links{gap:14px} .nav .links a{font-size:11px; letter-spacing:.05em} }
-  @media(max-width:520px){ .nav .links a[href="#top"]{display:none} }
+  @media(max-width:600px){ .nav .links a[href="#top"], #navContact{display:none} }
 
   /* Hero */
   .hero{position:relative; overflow:hidden; background:var(--bg)}
   .hero .hwrap{position:relative; z-index:2; max-width:1512px; margin:0 auto; padding:72px clamp(20px,4.5vw,64px) 52px}
-  .hero .wm{position:absolute; top:-30px; right:-40px; width:540px; max-width:50vw; z-index:1; pointer-events:none; opacity:.6}
+  .hero .wm{position:absolute; top:-30px; right:-40px; width:540px; max-width:50vw; z-index:1; pointer-events:none; opacity:.3}
   .hero .wm svg{width:100%; height:auto}
   .hero h1{font-family:'Newsreader','Iowan Old Style',Georgia,serif; font-weight:400; font-size:clamp(44px,7vw,84px); line-height:1.02; letter-spacing:-.015em; color:#2C371D; margin:0 0 18px; max-width:15ch}
   .hero h1 em{font-style:italic}
   .hero h1 u{text-decoration-thickness:2px; text-underline-offset:5px}
   .hero p{font-size:19px; color:#5f5c4d; max-width:34ch; margin:0 0 26px}
-  .hero .hbtn{display:inline-block; background:var(--brand); color:#fff; border:0; padding:15px 28px; border-radius:6px; font-family:inherit; font-weight:700; letter-spacing:.09em; text-transform:uppercase; font-size:14px; cursor:pointer}
+  .hero .hbtn{display:inline-flex; align-items:center; justify-content:center; line-height:1; background:var(--brand); color:#fff; border:1px solid var(--brand); padding:15px 28px; border-radius:6px; font-family:inherit; font-weight:700; letter-spacing:.09em; text-transform:uppercase; font-size:14px; cursor:pointer}
   .hero .hbtn:hover{background:var(--brand-hover)}
   .hbtns{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
   .hero .hbtn.alt{background:transparent; color:var(--brand); border:1px solid var(--brand); display:inline-flex; align-items:center; text-decoration:none}
   .hero .hbtn.alt:hover{background:var(--soft); color:var(--brand-dark)}
-  .nav .links a.navcta{background:var(--brand); color:#fff; padding:8px 15px; border-radius:999px; text-transform:none; letter-spacing:.01em; font-weight:700; font-size:13px}
-  .nav .links a.navcta:hover{background:var(--brand-hover); color:#fff}
-  @media(max-width:520px){ .nav .links a.navcta{padding:7px 12px; font-size:12px} }
-  .hero-strip{overflow:hidden; background:var(--bg)}
-  .hero-strip::-webkit-scrollbar{height:0}
-  .hero-track{display:flex; gap:4px; width:max-content; animation:heroScroll 60s linear infinite}
-  .hero-strip:hover .hero-track{animation-play-state:paused}
-  @keyframes heroScroll{from{transform:translateX(0)} to{transform:translateX(-50%)}}
-  @media(prefers-reduced-motion:reduce){ .hero-track{animation:none} .hero-strip{overflow-x:auto} }
-  .hero-strip .tile{flex:0 0 clamp(280px,29vw,400px); height:clamp(360px,42vw,480px); background-size:cover; background-position:center; background-color:#e4ded2}
+  .hero-strip{position:relative; overflow:hidden; height:clamp(360px,44vw,580px); background:#e4ded2}
+  .heroslide{position:absolute; inset:0; background-size:cover; background-position:center; opacity:0; transition:opacity 1.8s ease}
+  .heroslide.on{opacity:1}
+  .heroslide.ph{background:linear-gradient(160deg,#e9e3d6,#e4dbea); opacity:1}
+  @media(prefers-reduced-motion:reduce){ .heroslide{transition:none} }
   .hero-strip .tile.ph{background:linear-gradient(160deg,#e9e3d6,#e4dbea)}
-  @media(max-width:760px){ .hero .wm{opacity:.45; width:70vw} .hero-strip .tile{flex-basis:74vw; height:300px} }
+  @media(max-width:760px){ .hero .wm{opacity:.3; width:70vw} .hero-strip{height:320px} }
 
   /* Values strip */
   .strip{background:var(--brand-dark); color:#f4e9f0}
@@ -96,7 +91,7 @@
   .spacer{flex:1}
 
   /* Grid */
-  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:24px}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px}
   .card{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; cursor:pointer; transition:.18s; box-shadow:var(--shadow)}
   .card:hover{transform:translateY(-3px)}
   .card .ph{aspect-ratio:3/4; background:linear-gradient(160deg,var(--soft),#f3e6d9); position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden}
@@ -108,8 +103,11 @@
   .card .price{font-size:14px; color:var(--ink-soft)}
   .card .price b{color:var(--brand); font-size:16px}
   .empty{grid-column:1/-1; text-align:center; color:var(--muted); padding:50px}
+  .secttl{font-size:13px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink); font-weight:700; margin:6px 0 18px; display:flex; align-items:baseline; gap:10px}
+  .secttl .cnt{font-size:12px; letter-spacing:.03em; text-transform:none; color:var(--muted); font-weight:400}
+  #newWrap{margin-bottom:42px}
   @media(max-width:560px){
-    .grid{grid-template-columns:1fr 1fr; gap:12px}
+    .grid{grid-template-columns:1fr 1fr; gap:8px}
     .card .b{padding:12px 12px}
     .card .name{font-size:14px; margin:2px 0 5px}
     .card .cmeta{font-size:11.5px; margin-bottom:5px}
@@ -281,7 +279,7 @@
       <a href="#collection" onclick="closeProduct()">Collection</a>
       <a href="#how" onclick="closeProduct()">How it works</a>
       <a id="navContact" href="#">Contact</a>
-      <a class="navcta" href="https://airtable.com/app4S7VgIYB4UTFdW/pagRxgZqlwG6vXnSs/form" target="_blank" rel="noopener noreferrer">Lend with Yíká</a>
+      <a href="https://airtable.com/app4S7VgIYB4UTFdW/pagRxgZqlwG6vXnSs/form" target="_blank" rel="noopener noreferrer">Lend with Yíká</a>
     </nav>
   </div>
 </header>
@@ -289,7 +287,7 @@
 <a id="top"></a>
 <div id="mainView">
 <section class="hero">
-  <div class="wm"><svg class="wmk" fill="#efe7d4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1884.66 1855.75">
+  <div class="wm"><svg class="wmk" fill="#B5C63C" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1884.66 1855.75">
   
   <path class="cls-1" d="M1604.11,1457.3c-2.01,2.34-5.04,3.53-9,3.53h-.24c-9.06-.15-27.01-.06-46.02.04-30.02.16-64.05.34-79.05-.31l-.48-.03-.47-.11c-8.6-2.07-7.94-9.22-7.51-13.94.07-.66.13-1.36.18-2.09l.04-.32c1.39-10.04,4.22-28.08,6.29-41.25l1.4-8.89c10.12-59.18,26.27-176.48,20.74-297.57-5.81-127.24-33.71-220.65-82.91-277.64-14.87-17.22-32.63-31.89-52.72-42.62-20.35-10.88-42.72-17.54-65.57-20.46-14.13-1.8-28.45-3.19-42.59-.8-13.25,2.23-26.17,6.48-38.24,12.39-9.33,4.56-18.2,10.14-26.23,16.74-15.02,12.34-33.68,33.44-37.26,63.94-2.67,32.99,4.67,64.41,23.1,98.86,16.43,30.72,39.94,60.13,62.68,88.56,34.09,42.64,69.34,86.74,83.33,137.74,11.79,36.61,14.68,80.21,8.17,122.78-6.79,44.33-22.81,83.97-46.34,114.63-31.23,40.7-73.04,62.03-121.32,62.03-2.72,0-5.45-.06-8.22-.2h-1.21c-42.14.01-79.49-15.15-111.02-45.06-27.01-25.61-49.47-62.36-64.97-106.29-21.98-59.52-35.21-135.42-40.28-231.41-22.52,90.32-63.85,175.26-117.1,240.32-31.08,37.99-65.96,69.07-103.66,92.37-41.07,25.39-85.53,41.54-132.16,48-11.03,1.54-22.27,2.3-33.57,2.3-34.34,0-69.32-7-101.18-20.5-44.45-18.82-80.53-48.72-104.35-86.45l-.09-.15c-32.35-55.44-37.87-171.84-10.75-226.45l.5-1,.87-.7c5.58-4.42,12.39-2.48,17.35-1.07l.24.07c26.91,9.09,90.8,31.42,117.01,40.6,5.03,1.72,7.04,4.79,7.84,7.05,2.18,6.2-2,12.82-5.35,18.14-.37.6-.74,1.17-1.08,1.73l-.1.16c-27.15,40.56-31.64,90.34-11.44,126.83,20.37,37.17,58.11,49.08,86.19,52.53,34,4.18,74.38-1.82,108.01-16.06l.1-.04c89.19-35.6,159.31-106.59,202.78-205.32,38.73-87.97,53.8-192.22,42.42-293.55-.38-2.96-.79-6.18-1.22-9.57-13.25-103.79-48.19-377.67-166.38-377.67-1.23,0-2.46.03-3.71.09-19.86,2.32-37.29,13.27-50.4,31.68-12.51,17.56-20.74,41.01-23.81,67.8l-.03.17c-5.34,35.63.86,72.28,18.97,112.04,16.34,35.88,39.79,69.1,62.42,100.05,42.76,60.66,81.3,121.2,83.75,195.51,2.09,44.08-12.83,85.55-43.16,119.85-27.94,31.6-67.11,54.57-110.3,64.69l-.32.06c-18.37,3.07-36.12,4.61-53.21,4.61-57.79,0-108.11-17.53-150.09-52.4-124.77-103.61-147.55-335.49-150.02-464.56-.45-7.58-.9-15.22-1.34-22.92-3.71-63.6-7.54-129.37-17.31-188.24-.64-4.02-1.46-8.94-2.31-14.05-1.45-8.73-2.95-17.75-3.82-23.9-.69-5.64-.99-10.14,1.8-13.39,2.4-2.8,5.94-3.28,9.08-3.38h.13c21.86-.09,104.09-.2,123.31.06h.3c9.46.72,10.41,6.96,10.18,12.32v.15c-.4,5.49-2.11,16.14-3.76,26.44-.81,5.08-1.58,9.88-2.17,13.9-17.3,104.66-34.24,256.8-16.86,387.83,21.01,158.29,86.37,247.54,194.28,265.28,29.21,4.8,59.78-.54,85.94-14.3,27.77-14.62,47.67-37.23,56.04-63.68,8.57-33.11,3.97-65.88-14.45-103.14-16.51-33.37-42.42-66.3-67.48-98.16-33.97-43.17-69.09-87.82-83.09-135.8-15.35-49.79-16.3-107.75-2.58-158.95,7.32-27.31,18.47-51.8,33.14-72.8,15.91-22.76,35.62-40.85,58.58-53.77l.59-.28c63.16-25.33,118.21-22.79,163.63,7.55,45.03,30.08,79.65,86.38,102.91,167.32,20.84,72.56,26.75,144.45,28.21,188.99,11.02-44.85,27.9-90.28,49.32-132.54,26.37-52.03,58.43-97.69,95.27-135.72,40.21-41.51,84.44-71.99,131.44-90.6,51.95-20.56,106.47-26.19,162.06-16.73l.29.06c62.92,14.64,110.25,43.04,140.66,84.4,30.44,41.39,43.95,95.78,40.16,161.66v.16c-.3,3.16-.56,6.91-.86,11.26-2.36,33.92-5.61,65.04-19.3,73.32-2.96,1.79-7.81,3.34-14.2.63-14.48-4.73-40.21-13.71-65.1-22.39-19.33-6.75-37.59-13.12-49.45-17.11l-.46-.18c-.52-.24-1.1-.46-1.69-.69-3.13-1.24-7.41-2.93-9.12-7.13-2.72-6.05,1.53-12.7,4.95-18.05.82-1.28,1.59-2.48,2.13-3.48l.21-.34c26.65-40.69,30.53-90.38,9.89-126.64-18.38-28.55-45.45-45.8-80.45-51.25-31.05-4.84-67.72-.15-106.05,13.55-33.99,12.16-66.78,30.48-92.31,51.58-31.88,25.51-59.8,56.42-83.02,91.93-21.9,33.46-39.71,71.09-52.95,111.85-24.91,76.68-33.18,162.29-23.91,247.62.39,3.05.81,6.31,1.25,9.74,6.64,51.71,19.01,147.97,44.84,229.64,30.75,97.19,71.58,146.46,121.38,146.46.28,0,.56,0,.84,0,24.92-2.11,45.39-16.42,59.21-41.4,12.39-22.39,19.11-52.6,18.92-85.06-.19-31.02-6.84-61.45-18.26-83.49l-.06-.12c-16.2-33.42-38.43-65.32-59.93-96.18-41.76-59.96-84.96-121.95-87.83-199.46-1.76-33.96,5.67-65.5,22.09-93.67,14.9-25.56,37.33-47.89,64.87-64.56,70.31-42.56,163.04-44.27,230.74-4.24,75.46,43.29,126,113.64,154.47,215.04,24.88,88.62,30.01,187.99,34.98,284.08,3.18,61.47,6.18,119.54,14.17,171.74,2.69,19.19,5.74,37.64,8.98,57.16l1.23,7.39c.92,5.53,1.87,11.25-1.59,15.29Z"/>
   <path class="cls-1" d="M1123.44,156.26v1.84l-.02.22c-.37,4.23-3.16,6.94-5.54,8.83l-.17.12c-9.07,6.61-23.49,15.32-38.76,24.53l-4.62,2.8c-14.46,8.64-28.02,16.99-42.37,25.82-4.29,2.64-8.63,5.31-13.07,8.04-6.7,4.12-13.07,8.18-18.68,11.75-7.21,4.59-13.45,8.56-18.64,11.59-5.04,3.5-9.3,4.94-12.98,4.94-6.98,0-11.91-5.13-16.2-11.15l-.24-.37c-1.05-1.79-2.83-4-4.71-6.34-6.37-7.92-15.98-19.88-5.62-29.96l.1-.09c24.8-22.84,109.5-95.98,127.37-110.73l.62-.51.76-.3c9.32-3.59,14.86,4,19.31,10.1,1.26,1.73,2.56,3.51,3.96,5.15l.36.49c2.31,3.51,5.92,8.17,9.73,13.09,8.24,10.65,16.77,21.67,19.18,29.42l.23.72Z"/>
@@ -306,16 +304,8 @@
 </section>
 <div class="hero-strip" id="heroStrip"></div>
 
-<div class="strip"><div class="wrap">
-  <span>Browse - Request - Wear - Return</span>
-</div></div>
-
 <section id="collection">
   <div class="wrap">
-    <div class="shead">
-      <div><div class="tag">Available to rent</div><h2>The Collection</h2></div>
-      <p id="countLabel"></p>
-    </div>
     <div class="toolbar">
       <input id="q" placeholder="Search name or brand…" oninput="render()" style="min-width:220px">
       <select id="fCat" onchange="render()"><option value="">All categories</option></select>
@@ -328,6 +318,11 @@
         <option value="high">Price: high to low</option>
       </select>
     </div>
+    <div id="newWrap" style="display:none">
+      <div class="secttl">New arrivals</div>
+      <div class="grid" id="gridNew"></div>
+    </div>
+    <div class="secttl">All products <span id="countLabel" class="cnt"></span></div>
     <div class="grid" id="grid"></div>
   </div>
 </section>
@@ -458,21 +453,9 @@ function buildFilters(){
   const fill=(id,arr)=>{const s=document.getElementById(id); arr.forEach(v=>{const o=document.createElement('option'); o.value=v; o.textContent=v; s.appendChild(o);});};
   fill('fCat',cats); fill('fBrand',brands); fill('fSize',sizes);
 }
-function render(){
-  const q=(document.getElementById('q').value||'').toLowerCase();
-  const fc=document.getElementById('fCat').value, fb=document.getElementById('fBrand').value, fs=document.getElementById('fSize').value;
-  let list=DATA.items.filter(i=>{
-    const hit=(i.name+' '+(i.brand||'')).toLowerCase().includes(q);
-    return hit && (!fc||i.category===fc) && (!fb||i.brand===fb) && (!fs||i.size===fs);
-  });
-  const sort=document.getElementById('sort').value;
-  if(sort==='low') list.sort((a,b)=>fromPrice(a)-fromPrice(b));
-  else if(sort==='high') list.sort((a,b)=>fromPrice(b)-fromPrice(a));
+function cardHTML(i){
   const d0=(DATA.pricing.durations||[4])[0];
-  document.getElementById('countLabel').textContent=`Showing ${list.length} of ${DATA.items.length} pieces`;
-  const g=document.getElementById('grid');
-  if(!list.length){ g.innerHTML=`<div class="empty">No pieces match your filters.</div>`; return; }
-  g.innerHTML=list.map(i=>`<div class="card" onclick="openProduct('${i.id}')">
+  return `<div class="card" onclick="openProduct('${i.id}')">
     <div class="ph">${i.image?`<img src="${esc(i.image)}" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'noimg',textContent:'Yíká'}))">`:`<div class="noimg">Yíká</div>`}</div>
     <div class="b">
       <div class="brand">${esc(i.brand||'')}</div>
@@ -481,7 +464,28 @@ function render(){
       <div class="price">From <b>${fmt(fromPrice(i))}</b> <span style="color:var(--muted)">/ ${d0} days</span></div>
       ${i.rrp?`<div class="cretail">Retail <s>${fmt(i.rrp)}</s></div>`:''}
     </div>
-  </div>`).join('');
+  </div>`;
+}
+function render(){
+  const q=(document.getElementById('q').value||'').toLowerCase();
+  const fc=document.getElementById('fCat').value, fb=document.getElementById('fBrand').value, fs=document.getElementById('fSize').value;
+  const filtered=DATA.items.filter(i=>{
+    const hit=(i.name+' '+(i.brand||'')).toLowerCase().includes(q);
+    return hit && (!fc||i.category===fc) && (!fb||i.brand===fb) && (!fs||i.size===fs);
+  });
+  const list=filtered.slice();
+  const sort=document.getElementById('sort').value;
+  if(sort==='low') list.sort((a,b)=>fromPrice(a)-fromPrice(b));
+  else if(sort==='high') list.sort((a,b)=>fromPrice(b)-fromPrice(a));
+  // New arrivals: items flagged in Airtable (NewArrival), else the most recently added
+  let news=filtered.filter(i=>i.newArrival);
+  if(!news.length) news=filtered.slice(-8);
+  const newWrap=document.getElementById('newWrap'), gNew=document.getElementById('gridNew');
+  if(filtered.length && news.length){ newWrap.style.display=''; gNew.innerHTML=news.map(cardHTML).join(''); }
+  else { newWrap.style.display='none'; }
+  document.getElementById('countLabel').textContent=`(${list.length})`;
+  const g=document.getElementById('grid');
+  g.innerHTML = list.length ? list.map(cardHTML).join('') : `<div class="empty">No pieces match your filters.</div>`;
 }
 
 /* ===================================================================
@@ -973,27 +977,25 @@ function showTerms(e){ if(e)e.preventDefault();
 }
 
 /* ---------- hero image strip (event photos, with graceful fallback) ---------- */
-function heroPlaceholders(strip,n){
-  strip.innerHTML='';
-  const track=document.createElement('div'); track.className='hero-track';
-  // two copies so the marquee loops seamlessly
-  for(let k=0;k<2;k++){ for(let i=0;i<n;i++){ const t=document.createElement('div'); t.className='tile ph'; track.appendChild(t);} }
-  strip.appendChild(track);
+function heroPlaceholders(strip){
+  strip.innerHTML=''; const el=document.createElement('div'); el.className='heroslide ph on'; strip.appendChild(el);
 }
 function initHero(){
   const strip=document.getElementById('heroStrip'); if(!strip)return;
   const srcs=Array.isArray(HERO_IMAGES)?HERO_IMAGES:[];
-  if(!srcs.length){ heroPlaceholders(strip,5); return; }
+  if(!srcs.length){ heroPlaceholders(strip); return; }
   const good=[]; let done=0;
   srcs.forEach(s=>{ const im=new Image(); im.onload=()=>{good.push(s); tick();}; im.onerror=tick; im.src=s; });
   function tick(){ if(++done!==srcs.length) return;
     const list=srcs.filter(s=>good.includes(s));
-    if(!list.length){ heroPlaceholders(strip,Math.max(srcs.length,5)); return; }
+    if(!list.length){ heroPlaceholders(strip); return; }
     strip.innerHTML='';
-    const track=document.createElement('div'); track.className='hero-track';
-    // duplicate the set so the CSS marquee (translateX -50%) scrolls forever with no gap
-    for(let k=0;k<2;k++){ list.forEach(s=>{ const t=document.createElement('div'); t.className='tile'; t.style.backgroundImage=`url("${s}")`; track.appendChild(t); }); }
-    strip.appendChild(track);
+    // stacked full-width slides that slowly crossfade
+    list.forEach((s,i)=>{ const el=document.createElement('div'); el.className='heroslide'+(i===0?' on':''); el.style.backgroundImage=`url("${s}")`; strip.appendChild(el); });
+    if(list.length>1){
+      let idx=0;
+      setInterval(()=>{ const sl=strip.querySelectorAll('.heroslide'); sl[idx].classList.remove('on'); idx=(idx+1)%sl.length; sl[idx].classList.add('on'); }, 5000);
+    }
   }
 }
 /* modal */
