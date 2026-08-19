@@ -31,7 +31,7 @@ module.exports = async (req, res) => {
         });
       }
     } while (offset);
-    res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300');
+    res.setHeader('Cache-Control', 's-maxage=10, stale-while-revalidate=20');
     res.status(200).json({ pricing: PRICING, items });
   } catch (e) {
     res.status(500).json({ error: String(e.message || e) });

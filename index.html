@@ -60,6 +60,12 @@
   .hero p{font-size:19px; color:#5f5c4d; max-width:34ch; margin:0 0 26px}
   .hero .hbtn{display:inline-block; background:var(--brand); color:#fff; border:0; padding:15px 28px; border-radius:6px; font-family:inherit; font-weight:700; letter-spacing:.09em; text-transform:uppercase; font-size:14px; cursor:pointer}
   .hero .hbtn:hover{background:var(--brand-hover)}
+  .hbtns{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
+  .hero .hbtn.alt{background:transparent; color:var(--brand); border:1px solid var(--brand); display:inline-flex; align-items:center; text-decoration:none}
+  .hero .hbtn.alt:hover{background:var(--soft); color:var(--brand-dark)}
+  .nav .links a.navcta{background:var(--brand); color:#fff; padding:8px 15px; border-radius:999px; text-transform:none; letter-spacing:.01em; font-weight:700; font-size:13px}
+  .nav .links a.navcta:hover{background:var(--brand-hover); color:#fff}
+  @media(max-width:520px){ .nav .links a.navcta{padding:7px 12px; font-size:12px} }
   .hero-strip{overflow:hidden; background:var(--bg)}
   .hero-strip::-webkit-scrollbar{height:0}
   .hero-track{display:flex; gap:4px; width:max-content; animation:heroScroll 60s linear infinite}
@@ -275,6 +281,7 @@
       <a href="#collection" onclick="closeProduct()">Collection</a>
       <a href="#how" onclick="closeProduct()">How it works</a>
       <a id="navContact" href="#">Contact</a>
+      <a class="navcta" href="https://airtable.com/app4S7VgIYB4UTFdW/pagRxgZqlwG6vXnSs/form" target="_blank" rel="noopener noreferrer">Lend with Yíká</a>
     </nav>
   </div>
 </header>
@@ -291,7 +298,10 @@
   <div class="hwrap">
     <h1>Redefine your style<br>&mdash;<em>without</em> breaking the <u>budget</u></h1>
     <p>Browse the collection, rent high-end pieces for your next moment.</p>
-    <button class="hbtn" onclick="document.getElementById('collection').scrollIntoView({behavior:'smooth'})">Browse the collection</button>
+    <div class="hbtns">
+      <button class="hbtn" onclick="document.getElementById('collection').scrollIntoView({behavior:'smooth'})">Browse the collection</button>
+      <a class="hbtn alt" href="https://airtable.com/app4S7VgIYB4UTFdW/pagRxgZqlwG6vXnSs/form" target="_blank" rel="noopener noreferrer">Lend with Yíká</a>
+    </div>
   </div>
 </section>
 <div class="hero-strip" id="heroStrip"></div>
