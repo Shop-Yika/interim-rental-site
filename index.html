@@ -402,8 +402,8 @@
    =================================================================== */
 const REQUEST_EMAIL = "admin@shopyika.com";   // where rental requests are emailed (mailto fallback)
 const FORM_ENDPOINT = "https://formspree.io/f/mkjwrkkv";                 // optional: paste a Formspree URL (https://formspree.io/f/xxxx) for inbox delivery without opening a mail app
-const DATA_URL      = "catalogue.json";   // catalogue published from the admin tool
-const HERO_IMAGES   = ["event/hero-1.jpeg","event/hero-2.jpeg","event/hero-3.jpeg","event/hero-4.jpeg","event/hero-5.jpeg","event/hero-6.jpeg"]; // event photos for the hero carousel (see DEPLOY-README)
+const DATA_URL      = "/catalogue.json";   // catalogue published from the admin tool (absolute so it works on /brand and /rent pages)
+const HERO_IMAGES   = ["/event/hero-1.jpeg","/event/hero-2.jpeg","/event/hero-3.jpeg","/event/hero-4.jpeg","/event/hero-5.jpeg","/event/hero-6.jpeg"]; // event photos for the hero carousel (absolute paths)
 /* =================================================================== */
 
 const fmt = n => 'CAD$ ' + (Number(n)||0).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -471,7 +471,7 @@ async function boot(){
   initHero(); buildFilters(); render(); buildFootShop();
   // deep link: /rent/<slug> injects window.__RENT_ITEM__; /?item=<id> also works
   const _item=window.__RENT_ITEM__ || new URLSearchParams(location.search).get('item');
-  if(_item && DATA.items.some(x=>x.id===_item)) openProduct(_item);
+  if(_item && DATA.items.some(x=>x.id===_item)) openProduct(_item,{push:false});
   // /category/<slug> and /brand/<slug> inject window.__RENT_FILTER__ to pre-apply a filter
   const _flt=window.__RENT_FILTER__;
   if(_flt){
@@ -561,7 +561,7 @@ function computeBlocks(){
 function fmtShort(iso){ return new Date(iso+'T00:00:00').toLocaleDateString('en-CA',{month:'short',day:'numeric'}); }
 function fmtLong(iso){ return new Date(iso+'T00:00:00').toLocaleDateString('en-CA',{weekday:'short',month:'short',day:'numeric'}); }
 
-function openProduct(id){
+function openProduct(id, opts){
   const it=DATA.items.find(x=>x.id===id); if(!it) return;
   const durs=(DATA.pricing.durations||[4,7,14,30]);
   const first=new Date(); first.setDate(1); first.setHours(0,0,0,0);
@@ -637,13 +637,23 @@ function openProduct(id){
   document.getElementById('mainView').style.display='none';
   document.getElementById('productView').classList.add('open');
   window.scrollTo({top:0,behavior:'auto'});
+  if(!(opts&&opts.push===false)){ try{ history.pushState({item:id},'','/rent/'+slugify(it.name)); }catch(e){} }
   loadItemAvailability(it.id);
 }
-function closeProduct(){
+function closeProduct(opts){
   const pv=document.getElementById('productView'); if(pv) pv.classList.remove('open');
   const mv=document.getElementById('mainView'); if(mv) mv.style.display='';
   const bkb=document.getElementById('pvBook'); if(bkb) bkb.classList.remove('show');
+  if(opts&&opts.push===false) return;
+  if(history.state && history.state.item){ history.back(); }
+  else { try{ history.pushState({},'','/'); }catch(e){} }
 }
+window.addEventListener('popstate',function(){
+  if(typeof DATA==='undefined' || !DATA || !DATA.items) return;
+  const m=location.pathname.match(/^\/rent\/([^\/?#]+)/);
+  if(m){ const it=DATA.items.find(x=>slugify(x.name)===m[1]); if(it){ openProduct(it.id,{push:false}); return; } }
+  closeProduct({push:false});
+});
 function pvSwap(i){
   const imgs=bk._imgs||[]; const m=document.getElementById('pvMain');
   if(m && imgs[i]) m.src=imgs[i];
