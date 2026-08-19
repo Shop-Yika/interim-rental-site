@@ -326,7 +326,7 @@
   <div class="wrap">
     <div class="shead"><div><div class="tag">Simple by design</div><h2>How renting works</h2></div></div>
     <div class="steps">
-      <div class="step"><div class="n">1</div><h3>Browse</h3><p>Explore the collection and find pieces for your occasion. Prices show for 4, 7, 14 and 30-day rentals.</p></div>
+      <div class="step"><div class="n">1</div><h3>Browse</h3><p>Explore the edit and find pieces for your occasion. Prices show for 4, 7, 14 and 30-day rentals.</p></div>
       <div class="step"><div class="n">2</div><h3>Request</h3><p>Pick your dates and send a rental request. No payment or card details needed to request.</p></div>
       <div class="step"><div class="n">3</div><h3>We confirm</h3><p>We check availability, confirm your rental and share a secure way to pay. A Damage Protection Fee applies.</p></div>
       <div class="step"><div class="n">4</div><h3>Wear &amp; return</h3><p>Enjoy your piece, then return it by the date. Report any issues within 48 hours.</p></div>
@@ -463,7 +463,7 @@ function render(){
   const g=document.getElementById('grid');
   if(!list.length){ g.innerHTML=`<div class="empty">No pieces match your filters.</div>`; return; }
   g.innerHTML=list.map(i=>`<div class="card" onclick="openProduct('${i.id}')">
-    <div class="ph">${i.image?`<img src="${esc(i.image)}" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'noimg',textContent:'Yíká'}))">`:`<div class="noimg">Yíká</div>`}</div>
+    <div class="ph">${i.image?`<img src="${esc(i.image)}" loading="lazy" decoding="async" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'noimg',textContent:'Yíká'}))">`:`<div class="noimg">Yíká</div>`}</div>
     <div class="b">
       <div class="brand">${esc(i.brand||'')}</div>
       <div class="name">${esc(i.name)}</div>
@@ -520,8 +520,8 @@ function openProduct(id){
   bk._imgs=imgs;
   const gallery = imgs.length
     ? `<div class="pv-gallery">
-        <div class="pv-img"><img id="pvMain" src="${esc(imgs[0])}"></div>
-        ${imgs.length>1?`<div class="pv-thumbs">${imgs.map((u,i)=>`<button class="pv-thumb ${i===0?'on':''}" onclick="pvSwap(${i})"><img src="${esc(u)}" alt=""></button>`).join('')}</div>`:''}
+        <div class="pv-img"><img id="pvMain" src="${esc(imgs[0])}" decoding="async"></div>
+        ${imgs.length>1?`<div class="pv-thumbs">${imgs.map((u,i)=>`<button class="pv-thumb ${i===0?'on':''}" onclick="pvSwap(${i})"><img src="${esc(u)}" loading="lazy" decoding="async" alt=""></button>`).join('')}</div>`:''}
       </div>`
     : `<div class="pv-gallery"><div class="pv-img"><div class="noimg" style="color:var(--brand);opacity:.5;font-size:13px;letter-spacing:.1em;text-transform:uppercase">Yíká</div></div></div>`;
   document.getElementById('pvBody').innerHTML=`
