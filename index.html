@@ -469,8 +469,8 @@ async function boot(){
   const em=document.getElementById('footEmail'); em.href='mailto:'+REQUEST_EMAIL; em.textContent=REQUEST_EMAIL;
   const nc=document.getElementById('navContact'); if(nc) nc.href='mailto:'+REQUEST_EMAIL;
   initHero(); buildFilters(); render(); buildFootShop();
-  // deep link from server-rendered /rent/ pages: /?item=<recordId> opens the booking view
-  const _item=new URLSearchParams(location.search).get('item');
+  // deep link: /rent/<slug> injects window.__RENT_ITEM__; /?item=<id> also works
+  const _item=window.__RENT_ITEM__ || new URLSearchParams(location.search).get('item');
   if(_item && DATA.items.some(x=>x.id===_item)) openProduct(_item);
 }
 function buildFootShop(){
