@@ -472,6 +472,13 @@ async function boot(){
   // deep link: /rent/<slug> injects window.__RENT_ITEM__; /?item=<id> also works
   const _item=window.__RENT_ITEM__ || new URLSearchParams(location.search).get('item');
   if(_item && DATA.items.some(x=>x.id===_item)) openProduct(_item);
+  // /category/<slug> and /brand/<slug> inject window.__RENT_FILTER__ to pre-apply a filter
+  const _flt=window.__RENT_FILTER__;
+  if(_flt){
+    const sel=document.getElementById(_flt.type==='brand'?'fBrand':'fCat');
+    if(sel){ const opt=[...sel.options].find(o=>o.value&&slugify(o.value)===_flt.value);
+      if(opt){ sel.value=opt.value; render(); const c=document.getElementById('collection'); if(c) c.scrollIntoView(); } }
+  }
 }
 function buildFootShop(){
   const fs=document.getElementById('footShop'); if(!fs) return;
