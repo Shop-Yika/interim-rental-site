@@ -39,6 +39,23 @@ function quote(rrp, adjustPct, days, method) {
   return { rental, shipping, hst, dpf, total };
 }
 
+function slugify(s) {
+  return String(s || '').normalize('NFKD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80);
+}
+
+// Build the ordered image list for an item (uploads first, then link field)
+function itemImages(f) {
+  let images = [];
+  const att = f.Image;
+  if (Array.isArray(att)) images = att.map(a => a && a.url).filter(Boolean);
+  else if (typeof att === 'string' && att.trim()) images = [att.trim()];
+  const linkRaw = f.ImageURL || f['Image URL'] || f.ImageLink || '';
+  if (linkRaw) String(linkRaw).split(/[\n,]+/).map(s => s.trim()).filter(Boolean)
+    .forEach(u => { if (!images.includes(u)) images.push(u); });
+  return images;
+}
+
 function addDays(s, n) { const d = new Date(s + 'T00:00:00'); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); }
 const overlaps = (s1, e1, s2, e2) => s1 <= e2 && s2 <= e1;
 
@@ -48,4 +65,4 @@ async function slack(text) {
   try { await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) }); } catch (e) {}
 }
 
-module.exports = { at, PRICING, BUFFER_DAYS, round2, rentalFee, quote, addDays, overlaps, slack };
+module.exports = { at, PRICING, BUFFER_DAYS, round2, rentalFee, quote, addDays, overlaps, slack, slugify, itemImages };

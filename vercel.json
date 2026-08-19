@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/rent/:slug", "destination": "/api/product?slug=:slug" },
+    { "source": "/category/:slug", "destination": "/api/collection?type=category&value=:slug" },
+    { "source": "/brand/:slug", "destination": "/api/collection?type=brand&value=:slug" },
+    { "source": "/sitemap.xml", "destination": "/api/sitemap" }
+  ]
+}
